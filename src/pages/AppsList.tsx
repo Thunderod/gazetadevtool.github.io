@@ -136,12 +136,16 @@ export function AppsList() {
     
     try {
       setIsDeleting(true);
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('apps')
         .delete()
-        .eq('id', appToDelete.id);
+        .eq('id', appToDelete.id)
+        .select();
         
       if (error) throw error;
+      if (!data || data.length === 0) {
+          throw new Error('Failed to delete on the backend. You may not have permission.');
+      }
       
       setApps(apps.filter(a => a.id !== appToDelete.id));
       setIsDeleteModalOpen(false);
