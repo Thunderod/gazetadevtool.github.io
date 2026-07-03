@@ -26,7 +26,7 @@ export function Login() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`,
         },
       });
 
@@ -48,7 +48,7 @@ export function Login() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`,
           },
         });
         if (error) throw error;
