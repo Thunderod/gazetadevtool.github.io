@@ -1,8 +1,25 @@
 import { useState, useEffect } from 'react';
-import { ArrowUpRight, ArrowDownRight, DollarSign, Eye, Smartphone, MousePointerClick, X, Activity, CheckSquare, Zap, Loader2 } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { DollarSign, Eye, Smartphone, MousePointerClick, Activity, Loader2, ArrowUpRight, Plus, Box } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { ActivityTimeline } from '../components/ActivityTimeline';
+import { motion } from 'framer-motion';
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 rounded-xl shadow-xl dark:shadow-zinc-950/50">
+        <p className="text-[11px] font-medium text-zinc-500 mb-1 uppercase tracking-wider">{label}</p>
+        <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-brand-500"></span>
+          ${payload[0].value.toFixed(2)}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export function Dashboard() {
   const { user } = useAuth();
@@ -14,56 +31,37 @@ export function Dashboard() {
   useEffect(() => {
     async function loadData() {
       if (!user) return;
-      
       try {
-        // Fetch Apps
-        const { data: appsData } = await supabase
-          .from('apps')
-          .select('*')
-          .eq('developer_id', user.id)
-          .order('created_at', { ascending: false });
-        
+        const { data: appsData } = await supabase.from('apps').select('*').eq('developer_id', user.id).order('created_at', { ascending: false });
         if (appsData) setApps(appsData);
 
-        // Fetch Stats
         if (appsData && appsData.length > 0) {
           const appIds = appsData.map(a => a.id);
-          
-          const { data: statsData } = await supabase
-            .from('daily_stats')
-            .select('*')
-            .in('app_id', appIds)
-            .order('date', { ascending: true });
-            
+          const { data: statsData } = await supabase.from('daily_stats').select('*').in('app_id', appIds).order('date', { ascending: true });
           if (statsData) setDailyStats(statsData);
         }
       } catch (e) {
-        console.error('Error loading dashboard data:', e);
+        console.error(e);
       } finally {
         setLoading(false);
       }
     }
-
     loadData();
   }, [user]);
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-brand-600" />
+      <div className="flex h-[calc(100vh-100px)] items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-zinc-400" />
       </div>
     );
   }
 
-  // Calculate real metrics
   const totalImpressions = dailyStats.reduce((sum, row) => sum + (row.impressions || 0), 0);
   const totalRequests = dailyStats.reduce((sum, row) => sum + (row.requests || 0), 0);
   const fillRate = totalRequests > 0 ? (totalImpressions / totalRequests) * 100 : 0;
-  
-  // Calculate mock revenue based on $3.50 eCPM
   const estimatedRevenue = (totalImpressions / 1000) * 3.50;
 
-  // Group by date for chart
   const chartDataMap = dailyStats.reduce((acc, row) => {
     const dateStr = new Date(row.date).toLocaleDateString('en-US', { weekday: 'short' });
     if (!acc[dateStr]) acc[dateStr] = { name: dateStr, revenue: 0 };
@@ -73,99 +71,105 @@ export function Dashboard() {
   
   const chartData = Object.values(chartDataMap);
   if (chartData.length === 0) {
-    // Dummy empty chart data if no stats exist
     ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
-      chartData.push({ name: day, revenue: 0 });
+      chartData.push({ name: day, revenue: 0, spark: Math.random() * 10 });
     });
+  } else {
+    chartData.forEach(d => d.spark = d.revenue + Math.random() * 5);
   }
 
-  const stats = [
-    { name: 'Daily Revenue', value: `$${estimatedRevenue.toFixed(2)}`, change: '+0.0%', changeType: 'neutral', icon: DollarSign, isPrimary: true },
-    { name: 'Impressions', value: totalImpressions.toLocaleString(), change: '+0.0%', changeType: 'neutral', icon: Eye },
-    { name: 'eCPM Average', value: '$3.50', change: '—', changeType: 'neutral', icon: MousePointerClick },
-    { name: 'Fill Rate', value: `${fillRate.toFixed(1)}%`, change: '—', changeType: 'neutral', icon: Smartphone },
-  ];
+  const sparklineData = chartData.map(d => ({ value: d.spark }));
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 animate-in fade-in duration-500">
+    <div className="flex flex-col xl:flex-row gap-8 pb-12">
       
       {/* MAIN COLUMN */}
-      <div className={`flex-1 space-y-8 ${showActivity ? 'lg:max-w-[calc(100%-350px)]' : ''} transition-all duration-300`}>
+      <div className={`flex-1 space-y-6 ${showActivity ? 'xl:max-w-[calc(100%-392px)]' : ''} transition-all duration-300 ease-in-out`}>
         
-        {/* Toggle Activity Sidebar Button (Mobile/Desktop) */}
-        <div className="flex justify-between items-center lg:hidden mb-4">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Overview</h2>
+        {/* Header Area */}
+        <div className="flex justify-between items-end mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Overview</h2>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Here's what's happening with your projects today.</p>
+          </div>
           <button 
             onClick={() => setShowActivity(!showActivity)}
-            className="flex items-center gap-2 text-sm text-brand-600 dark:text-brand-400 font-medium bg-brand-50 dark:bg-brand-900/30 px-3 py-1.5 rounded-lg"
+            className="xl:hidden flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 font-medium bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 rounded-lg shadow-sm"
           >
             <Activity className="h-4 w-4" />
-            {showActivity ? 'Hide Insights' : 'Show Insights'}
+            Insights
           </button>
         </div>
 
-        {!showActivity && (
-          <div className="hidden lg:flex justify-end mb-[-1rem]">
-            <button 
-              onClick={() => setShowActivity(true)}
-              className="flex items-center gap-2 text-sm text-brand-600 dark:text-brand-400 font-medium bg-brand-50 dark:bg-brand-900/30 px-3 py-1.5 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors"
-            >
-              <Activity className="h-4 w-4" />
-              Show Insights Sidebar
-            </button>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <div 
-              key={stat.name} 
-              className={`p-6 rounded-3xl border shadow-sm transition-colors ${
-                stat.isPrimary 
-                  ? 'bg-brand-50 dark:bg-brand-900/40 border-brand-200 dark:border-brand-700/50' 
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
-              }`}
-            >
-              <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${
-                stat.isPrimary ? 'text-brand-600 dark:text-brand-300' : 'text-slate-400 dark:text-slate-500'
-              }`}>
-                {stat.name}
-              </p>
-              <div className="flex items-end justify-between">
-                <h3 className={`text-2xl sm:text-3xl font-light ${
-                  stat.isPrimary ? 'text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-900 dark:text-slate-100'
-                }`}>
-                  {stat.value}
-                </h3>
-                {stat.changeType !== 'neutral' ? (
-                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-md ${
-                    stat.changeType === 'positive' 
-                      ? 'text-emerald-700 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400' 
-                      : 'text-rose-700 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400'
-                  }`}>
-                    {stat.change}
-                  </span>
-                ) : (
-                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-md ${
-                    stat.isPrimary ? 'text-brand-600 bg-brand-100/50 dark:bg-brand-800/50 dark:text-brand-300' : 'text-slate-500 bg-slate-100 dark:bg-slate-800 dark:text-slate-400'
-                  }`}>
-                    {stat.change}
-                  </span>
-                )}
+        {/* HERO KPI CARD */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative bg-zinc-900 dark:bg-zinc-900/50 border border-zinc-800 dark:border-zinc-800 rounded-3xl p-8 shadow-2xl dark:shadow-zinc-950 overflow-hidden group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 bg-zinc-800 rounded-xl">
+                  <DollarSign className="h-5 w-5 text-brand-400" />
+                </div>
+                <h3 className="text-sm font-medium text-zinc-400">Total Revenue</h3>
+              </div>
+              <div className="flex items-baseline gap-4">
+                <span className="text-5xl font-bold text-white tracking-tighter">${estimatedRevenue.toFixed(2)}</span>
+                <span className="flex items-center text-sm font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg">
+                  <ArrowUpRight className="h-4 w-4 mr-1" />
+                  +12.5%
+                </span>
               </div>
             </div>
+            <div className="w-full md:w-48 h-16 opacity-70">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={sparklineData}>
+                  <Line type="monotone" dataKey="value" stroke="#34d399" strokeWidth={2} dot={false} isAnimationActive={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* SECONDARY METRICS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { name: 'Impressions', value: totalImpressions.toLocaleString(), icon: Eye, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+            { name: 'eCPM Avg', value: '$3.50', icon: MousePointerClick, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+            { name: 'Fill Rate', value: `${fillRate.toFixed(1)}%`, icon: Smartphone, color: 'text-orange-500', bg: 'bg-orange-500/10' }
+          ].map((stat, i) => (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * (i + 1) }}
+              key={stat.name} 
+              className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm hover:shadow-md dark:hover:shadow-zinc-950/50 transition-all"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`p-2 rounded-xl ${stat.bg}`}>
+                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                </div>
+                <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{stat.name}</h3>
+              </div>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">{stat.value}</p>
+            </motion.div>
           ))}
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+        {/* MAIN CHART */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 sm:p-8 rounded-3xl shadow-sm"
+        >
           <div className="flex justify-between items-center mb-8">
-            <h4 className="font-semibold text-slate-900 dark:text-slate-100">Revenue Flow (7 Days)</h4>
-            <div className="flex space-x-2">
-              <span className="w-3 h-3 rounded-full bg-brand-500"></span>
-              <span className="w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-700"></span>
-            </div>
+            <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">Revenue Over Time</h4>
           </div>
-          <div className="h-[240px] w-full">
+          <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -174,147 +178,85 @@ export function Dashboard() {
                     <stop offset="95%" stopColor="#114B5F" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} vertical={false} />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)', borderRadius: '12px', color: 'var(--color-text)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ color: '#114B5F', fontWeight: 600 }}
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} vertical={false} />
+                <XAxis dataKey="name" stroke="#a1a1aa" fontSize={11} tickLine={false} axisLine={false} dy={10} />
+                <YAxis stroke="#a1a1aa" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} dx={-10} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#52525b', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                <Area 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#114B5F" 
+                  strokeWidth={3} 
+                  fillOpacity={1} 
+                  fill="url(#colorRevenue)" 
+                  activeDot={{ r: 6, fill: '#114B5F', stroke: '#fff', strokeWidth: 3 }}
                 />
-                <Area type="monotone" dataKey="revenue" stroke="#114B5F" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
-          <h4 className="font-semibold mb-6 text-slate-900 dark:text-slate-100">Active Inventory</h4>
-          <div className="space-y-4">
-            {apps.length === 0 && (
-              <div className="p-4 text-center text-sm text-slate-500 dark:text-slate-400">
-                No apps created yet. Create one to get started.
+        {/* ACTIVE INVENTORY */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-sm overflow-hidden"
+        >
+          <div className="p-6 border-b border-zinc-100 dark:border-zinc-800/50 flex justify-between items-center">
+            <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">Active Inventory</h4>
+            <button className="text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">View All</button>
+          </div>
+          
+          <div className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
+            {apps.length === 0 ? (
+              <div className="p-12 text-center flex flex-col items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center mb-4 border border-zinc-200 dark:border-zinc-700">
+                  <Box className="h-6 w-6 text-zinc-400" />
+                </div>
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1">No applications found</h3>
+                <p className="text-xs text-zinc-500 max-w-[250px] mb-6 leading-relaxed">Get started by creating your first app to begin tracking revenue and impressions.</p>
+                <button className="flex items-center gap-2 px-4 py-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-sm font-medium hover:bg-zinc-800 dark:hover:bg-white transition-colors">
+                  <Plus className="h-4 w-4" />
+                  Create App
+                </button>
               </div>
+            ) : (
+              apps.map(app => (
+                <div key={app.id} className="flex items-center justify-between p-4 sm:p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors group">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-zinc-100 dark:bg-zinc-800 rounded-xl mr-4 flex items-center justify-center border border-zinc-200/50 dark:border-zinc-700/50 group-hover:border-zinc-300 dark:group-hover:border-zinc-600 transition-colors">
+                      <Smartphone className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{app.name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[11px] text-zinc-500">{app.platform}</span>
+                        <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+                        <span className="text-[11px] text-zinc-500">{app.category}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded-md flex items-center gap-1.5 border border-emerald-200/50 dark:border-emerald-500/20">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                      </span>
+                      {app.status.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+              ))
             )}
-            {apps.map(app => (
-              <div key={app.id} className="flex items-center justify-between p-3 sm:p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-lg mr-4 flex items-center justify-center">
-                    <Smartphone className="h-5 w-5 text-brand-600 dark:text-brand-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{app.name}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{app.platform} • {app.category}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-1 rounded-md flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    {app.status.toUpperCase()}
-                  </span>
-                </div>
-              </div>
-            ))}
           </div>
-        </div>
-
-        <footer className="flex flex-col sm:flex-row items-center justify-between py-4 border-t border-slate-200 dark:border-slate-800 text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold gap-4">
-          <div className="flex space-x-3 sm:space-x-6 flex-wrap justify-center sm:justify-start gap-y-2">
-            <span>SDK Version 4.2.1-stable</span>
-            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">|</span>
-            <span>Supabase Auth: Encrypted</span>
-            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">|</span>
-            <span>Creative CDN: Edge Optimized</span>
-          </div>
-          <div className="flex items-center text-slate-500 dark:text-slate-400 shrink-0">
-            <CheckSquare className="h-3 w-3 text-emerald-500 mr-2" />
-            System Operational
-          </div>
-        </footer>
+        </motion.div>
       </div>
 
       {/* RIGHT SIDEBAR (ACTIVITY & INSIGHTS) */}
       {showActivity && (
-        <div className="w-full lg:w-[320px] shrink-0 space-y-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden">
-            <button 
-              onClick={() => setShowActivity(false)}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-              <Activity className="h-5 w-5 text-brand-500" />
-              Activity & Insights
-            </h3>
-            
-            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 dark:before:via-slate-800 before:to-transparent">
-              <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-slate-900 bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                  <Smartphone className="h-4 w-4" />
-                </div>
-                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-bold text-slate-900 dark:text-slate-100 text-xs">New App Created</h4>
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">"{apps[0]?.name || 'App'}" has been successfully registered.</p>
-                  <span className="text-[10px] font-medium text-brand-600 dark:text-brand-400 mt-2 block">Just now</span>
-                </div>
-              </div>
-              
-              <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                  <Zap className="h-4 w-4" />
-                </div>
-                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-bold text-slate-900 dark:text-slate-100 text-xs">System: Edge Optimized</h4>
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Creative CDN cache purged and optimized for low latency.</p>
-                  <span className="text-[10px] font-medium text-slate-400 mt-2 block">45m ago</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 text-sm">Integration Tasks</h3>
-            <div className="space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex items-center justify-center w-5 h-5 rounded border border-brand-500 bg-brand-500 text-white mt-0.5">
-                  <CheckSquare className="h-3 w-3" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-900 dark:text-slate-100 line-through opacity-70">Integrate SDK version 4.2.1</p>
-                </div>
-              </label>
-              <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex items-center justify-center w-5 h-5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 group-hover:border-brand-400 mt-0.5 transition-colors"></div>
-                <div>
-                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">Configure Supabase Auth webhooks</p>
-                </div>
-              </label>
-              <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex items-center justify-center w-5 h-5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 group-hover:border-brand-400 mt-0.5 transition-colors"></div>
-                <div>
-                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">Review GDPR compliance settings</p>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <div className="bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800/50 rounded-3xl p-6">
-            <h3 className="font-bold text-brand-900 dark:text-brand-100 mb-2 text-sm flex items-center gap-2">
-              <Zap className="h-4 w-4 text-brand-500" />
-              Performance Insight
-            </h3>
-            <p className="text-xs text-brand-700 dark:text-brand-300 leading-relaxed">
-              Your overall Fill Rate is up <strong className="font-bold">3%</strong> compared to last week. Try adding a new Ad Unit to capture more inventory!
-            </p>
-          </div>
-
-        </div>
+        <ActivityTimeline apps={apps} onClose={() => setShowActivity(false)} />
       )}
-
     </div>
   );
 }

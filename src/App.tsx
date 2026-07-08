@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { IntegrationDocs } from './pages/IntegrationDocs';
 import { Settings } from './pages/Settings';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { CommandPalette } from './components/CommandPalette';
 
 function ProtectedRoute() {
   const { session, isLoading } = useAuth();
@@ -33,6 +34,7 @@ export default function App() {
     <ThemeProvider defaultTheme="system" storageKey="gazeta-theme">
       <AuthProvider>
         <Router basename={import.meta.env.BASE_URL}>
+          <CommandPalette />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
