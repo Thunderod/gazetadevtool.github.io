@@ -18,19 +18,28 @@ class GazetaAdWidget extends HTMLElement {
 
       this.shadowRoot.innerHTML = `
         <style>
+            @keyframes shimmer {
+                0% { background-position: -1000px 0; }
+                100% { background-position: 1000px 0; }
+            }
             .loading {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                width: ${width};
-                height: ${height};
-                background: #0f172a;
+                width: 100%;
+                max-width: ${width};
+                aspect-ratio: ${parseInt(width) || 300} / ${parseInt(height) || 600};
+                height: auto;
+                max-height: 85vh;
+                background: linear-gradient(to right, #0f172a 4%, #1e293b 25%, #0f172a 36%);
+                background-size: 1000px 100%;
+                animation: shimmer 2s infinite linear;
                 color: #94a3b8;
                 font-family: system-ui, sans-serif;
-                border-radius: 1.5rem;
+                border-radius: 2rem;
             }
         </style>
-        <div class="loading">Loading Gazeta Ad...</div>
+        <div class="loading"></div>
       `;
   
       try {
@@ -55,13 +64,25 @@ class GazetaAdWidget extends HTMLElement {
         if (!jsonArray || jsonArray.length === 0) throw new Error("No active ads found that match criteria.");
         const ad = jsonArray[0];
   
-        this.renderAd(ad, width, height);
+        this.renderAd(ad, width, height, appId);
       } catch (e) {
         this.shadowRoot.innerHTML = `<div style="color:red; font-family: sans-serif; padding: 1rem; border: 1px dashed red;">Gazeta Ad Failed: ${e.message}</div>`;
       }
     }
   
-    renderAd(ad, width, height) {
+    async trackEvent(appId, eventType) {
+      try {
+        await fetch("https://hvoubbgzntldqoxqyoij.supabase.co/functions/v1/serve-ad", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ app_id: appId, event_type: eventType })
+        });
+      } catch (e) {
+        console.error("Gazeta SDK tracking error:", e);
+      }
+    }
+  
+    renderAd(ad, width, height, appId) {
       // SVG Icons (equivalent to Lucide React icons used in AdPreview.tsx)
       const playIcon = `<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
       const pauseIcon = `<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
@@ -82,8 +103,11 @@ class GazetaAdWidget extends HTMLElement {
           }
           .gazeta-ad-container {
             font-family: system-ui, -apple-system, sans-serif;
-            width: ${width};
-            height: ${height};
+            width: 100%;
+            max-width: ${width};
+            aspect-ratio: ${parseInt(width) || 300} / ${parseInt(height) || 600};
+            height: auto;
+            max-height: 85vh;
             border-radius: 2rem;
             overflow: hidden;
             background: #000;
@@ -256,6 +280,24 @@ class GazetaAdWidget extends HTMLElement {
           isMuted = !isMuted;
           media.muted = isMuted;
           muteBtn.innerHTML = isMuted ? mutedIcon : volumeIcon;
+        });
+      }
+
+      // 1. Impression Tracking (when ad is visible on screen)
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          this.trackEvent(appId, 'impression');
+          observer.disconnect();
+        }
+      }, { threshold: 0.5 });
+      
+      observer.observe(this.shadowRoot.querySelector('.gazeta-ad-container'));
+
+      // 2. Click Tracking
+      const ctaBtn = this.shadowRoot.querySelector('.cta-btn');
+      if (ctaBtn) {
+        ctaBtn.addEventListener('click', () => {
+          this.trackEvent(appId, 'click');
         });
       }
     }
