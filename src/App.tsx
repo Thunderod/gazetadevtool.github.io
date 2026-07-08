@@ -8,6 +8,7 @@ import { AuthCallback } from './pages/AuthCallback';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { IntegrationDocs } from './pages/IntegrationDocs';
 import { Settings } from './pages/Settings';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 function ProtectedRoute() {
   const { session, isLoading } = useAuth();
@@ -29,24 +30,26 @@ function ProtectedRoute() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Router basename={import.meta.env.BASE_URL}>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<DashboardLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="apps" element={<AppsList />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="docs" element={<IntegrationDocs />} />
-              <Route path="payouts" element={<div className="text-slate-500 p-8 text-center font-medium">Payouts Dashboard (Coming soon)</div>} />
-              <Route path="settings" element={<Settings />} />
+    <ThemeProvider defaultTheme="system" storageKey="gazeta-theme">
+      <AuthProvider>
+        <Router basename={import.meta.env.BASE_URL}>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<DashboardLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="apps" element={<AppsList />} />
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="docs" element={<IntegrationDocs />} />
+                <Route path="payouts" element={<div className="text-slate-500 p-8 text-center font-medium">Payouts Dashboard (Coming soon)</div>} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </Router>
-    </AuthProvider>
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

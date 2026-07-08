@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { User, CreditCard, Key, Save, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 export function Settings() {
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<'profile' | 'billing' | 'api'>('profile');
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -22,8 +24,8 @@ export function Settings() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl">
       <div>
-        <h1 className="text-lg font-semibold text-slate-900">Developer Settings</h1>
-        <p className="text-sm text-slate-500 mt-1">Manage your account, billing, and API preferences.</p>
+        <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Developer Settings</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage your account, billing, and API preferences.</p>
       </div>
 
       <div className="flex flex-col md:flex-row gap-8">
@@ -33,7 +35,7 @@ export function Settings() {
             <button
               onClick={() => setActiveTab('profile')}
               className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-                activeTab === 'profile' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'
+                activeTab === 'profile' ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-900'
               }`}
             >
               <User className={`mr-3 h-5 w-5 ${activeTab === 'profile' ? 'text-indigo-600' : 'text-slate-400'}`} />
@@ -42,7 +44,7 @@ export function Settings() {
             <button
               onClick={() => setActiveTab('billing')}
               className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-                activeTab === 'billing' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'
+                activeTab === 'billing' ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-900'
               }`}
             >
               <CreditCard className={`mr-3 h-5 w-5 ${activeTab === 'billing' ? 'text-indigo-600' : 'text-slate-400'}`} />
@@ -51,7 +53,7 @@ export function Settings() {
             <button
               onClick={() => setActiveTab('api')}
               className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-                activeTab === 'api' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'
+                activeTab === 'api' ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-900'
               }`}
             >
               <Key className={`mr-3 h-5 w-5 ${activeTab === 'api' ? 'text-indigo-600' : 'text-slate-400'}`} />
@@ -62,16 +64,16 @@ export function Settings() {
 
         {/* Content Area */}
         <div className="flex-1">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <form onSubmit={handleSave} className="p-8">
               
               {/* PROFILE TAB */}
               {activeTab === 'profile' && (
                 <div className="space-y-6 animate-in fade-in duration-300">
-                  <h2 className="text-xl font-bold text-slate-900 mb-6">Profile Details</h2>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Profile Details</h2>
                   
                   <div className="flex items-center gap-6 mb-8">
-                    <div className="h-20 w-20 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
+                    <div className="h-20 w-20 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 overflow-hidden flex items-center justify-center">
                       {user?.user_metadata?.avatar_url ? (
                         <img src={user.user_metadata.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
                       ) : (
@@ -95,14 +97,34 @@ export function Settings() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
                       <input 
                         type="email" 
                         defaultValue={user?.email || ''}
                         disabled
-                        className="w-full rounded-xl border border-slate-200 bg-slate-100 text-slate-500 px-4 py-2 text-sm outline-none cursor-not-allowed"
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 px-4 py-2 text-sm outline-none cursor-not-allowed"
                       />
-                      <p className="text-xs text-slate-500 mt-1">Email is managed by your authentication provider.</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Email is managed by your authentication provider.</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-8">
+                    <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-4">Appearance</h3>
+                    <div className="flex flex-wrap gap-4">
+                      {(['light', 'dark', 'system'] as const).map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setTheme(t)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium capitalize border transition-all ${
+                            theme === t 
+                              ? 'bg-brand-50 border-brand-200 text-brand-700 dark:bg-brand-900/30 dark:border-brand-700 dark:text-brand-300' 
+                              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          {t}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
