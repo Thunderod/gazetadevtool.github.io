@@ -10,7 +10,7 @@ export function IntegrationDocs() {
     setTimeout(() => setCopiedSnippet(null), 2000);
   };
 
-  const scriptSnippet = `<script src="${window.location.origin}/gazeta-sdk.js"></script>`;
+  const scriptSnippet = `<script src="${window.location.origin}${import.meta.env.BASE_URL}gazeta-sdk.js"></script>`;
   const htmlSnippet = `<gazeta-ad app-id="YOUR_APP_ID"></gazeta-ad>`;
 
   return (

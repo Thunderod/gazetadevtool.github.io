@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { app_id, target_age, app_category } = await req.json()
+    const { app_id, target_age, app_category, event_type = 'request' } = await req.json()
     if (!app_id) {
       return new Response(JSON.stringify({ error: 'Missing app_id' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 })
     }
@@ -34,7 +34,18 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Invalid or inactive app_id' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 })
     }
 
-    // Fetch from Project A (Ad Network Backend)
+    // Safely increment stat in Project B database
+    await supabaseAdmin.rpc('increment_daily_stat', {
+      p_app_id: app_id,
+      p_stat_type: event_type
+    })
+
+    // If it's just an impression or click, return success without fetching an ad
+    if (event_type === 'impression' || event_type === 'click') {
+      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 })
+    }
+
+    // Otherwise, fetch from Project A (Ad Network Backend)
     let projectAUrl = Deno.env.get('PROJECT_A_SUPABASE_URL')
     const projectAKey = Deno.env.get('PROJECT_A_ANON_KEY')
 
