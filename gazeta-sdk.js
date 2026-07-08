@@ -374,6 +374,35 @@ class GazetaAdWidget extends HTMLElement {
           this.shadowRoot.querySelectorAll('video').forEach(v => v.muted = isMuted);
           muteBtn.innerHTML = isMuted ? mutedIcon : volumeIcon;
         });
+
+        // Track Video Progress Percentages
+        const trackedMilestones = new Set();
+        fgMedia.addEventListener('timeupdate', () => {
+          if (!fgMedia.duration) return;
+          const percentage = (fgMedia.currentTime / fgMedia.duration) * 100;
+          
+          if (percentage > 0 && !trackedMilestones.has('video_start')) {
+            trackedMilestones.add('video_start');
+            this.trackEvent(appId, 'video_start');
+          }
+          if (percentage >= 25 && !trackedMilestones.has('video_25_percent')) {
+            trackedMilestones.add('video_25_percent');
+            this.trackEvent(appId, 'video_25_percent');
+          }
+          if (percentage >= 50 && !trackedMilestones.has('video_50_percent')) {
+            trackedMilestones.add('video_50_percent');
+            this.trackEvent(appId, 'video_50_percent');
+          }
+          if (percentage >= 75 && !trackedMilestones.has('video_75_percent')) {
+            trackedMilestones.add('video_75_percent');
+            this.trackEvent(appId, 'video_75_percent');
+          }
+          // Using >= 99% because videos with the 'loop' attribute sometimes reset before hitting exactly 100%
+          if (percentage >= 99 && !trackedMilestones.has('video_complete')) {
+            trackedMilestones.add('video_complete');
+            this.trackEvent(appId, 'video_complete');
+          }
+        });
       }
 
       // Tracking Logic
