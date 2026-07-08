@@ -13,20 +13,21 @@ class GazetaAdWidget extends HTMLElement {
         :host {
           display: block;
           width: 100%;
-          container-type: inline-size;
+          height: 100%;
+          container-type: size;
           container-name: gazeta-ad;
           
-          /* Fluid Typography & Sizing Tokens */
-          --gzt-radius: clamp(12px, 3cqi, 24px);
-          --gzt-spacing: clamp(12px, 3.5cqi, 24px);
-          --gzt-title: clamp(16px, 5cqi, 28px);
-          --gzt-body: clamp(13px, 3.5cqi, 16px);
-          --gzt-brand: clamp(10px, 2.5cqi, 14px);
-          --gzt-btn-text: clamp(14px, 4cqi, 18px);
-          --gzt-icon-size: clamp(24px, 7cqi, 36px);
-          --gzt-circle-btn: clamp(32px, 9cqi, 48px);
+          /* Fluid Tokens: scale beautifully across tiny phones to huge desktop monitors */
+          --gzt-spacing: clamp(12px, 3cqw, 32px);
+          --gzt-title: clamp(18px, 5cqw, 32px);
+          --gzt-body: clamp(14px, 3.5cqw, 20px);
+          --gzt-brand: clamp(11px, 2.5cqw, 16px);
+          --gzt-btn-text: clamp(15px, 4cqw, 22px);
+          --gzt-icon-size: clamp(28px, 7cqw, 48px);
+          --gzt-circle-btn: clamp(36px, 9cqw, 56px);
+          --gzt-radius: clamp(12px, 3cqw, 24px);
           
-          /* Safe Areas for Modern Devices */
+          /* Safe Areas for Edge-to-Edge constraints */
           --gzt-safe-top: max(var(--gzt-spacing), env(safe-area-inset-top));
           --gzt-safe-bottom: max(var(--gzt-spacing), env(safe-area-inset-bottom));
           --gzt-safe-left: max(var(--gzt-spacing), env(safe-area-inset-left));
@@ -39,16 +40,9 @@ class GazetaAdWidget extends HTMLElement {
           font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           width: 100%;
           height: 100%;
-          min-height: 250px;
-          max-height: 85vh; /* Prevent taking entire screen on extremely tall devices */
-          aspect-ratio: 4 / 5; /* Initial fallback, overridden by media intrinsic ratio */
-          border-radius: var(--gzt-radius);
-          overflow: hidden;
-          background: #0f172a;
+          background: #000;
           position: relative;
-          box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
-          display: flex;
-          flex-direction: column;
+          overflow: hidden;
           isolation: isolate;
         }
 
@@ -57,10 +51,13 @@ class GazetaAdWidget extends HTMLElement {
           background: #fee2e2;
           color: #991b1b;
           padding: var(--gzt-spacing);
+          display: flex;
+          flex-direction: column;
           text-align: center;
           justify-content: center;
           align-items: center;
-          min-height: 150px;
+          width: 100%;
+          height: 100%;
         }
         .error-title { font-size: var(--gzt-title); font-weight: 800; margin-bottom: 8px; }
         .error-desc { font-size: var(--gzt-body); }
@@ -69,9 +66,11 @@ class GazetaAdWidget extends HTMLElement {
       if (!appId || appId === 'YOUR_APP_ID') {
           this.shadowRoot.innerHTML = `
             <style>${rootStyles}</style>
-            <div class="gazeta-wrapper error-state">
-              <div class="error-title">Gazeta SDK Error</div>
-              <div class="error-desc">Please replace "YOUR_APP_ID" with your actual App ID from the dashboard.</div>
+            <div class="gazeta-wrapper">
+              <div class="error-state">
+                <div class="error-title">Gazeta SDK Error</div>
+                <div class="error-desc">Please replace "YOUR_APP_ID" with your actual App ID from the dashboard.</div>
+              </div>
             </div>
           `;
           return;
@@ -85,12 +84,16 @@ class GazetaAdWidget extends HTMLElement {
                 100% { background-position: 1000px 0; }
             }
             .loading {
+                width: 100%;
+                height: 100%;
                 background: linear-gradient(to right, #0f172a 4%, #1e293b 25%, #0f172a 36%);
                 background-size: 1000px 100%;
                 animation: shimmer 2s infinite linear;
             }
         </style>
-        <div class="gazeta-wrapper loading"></div>
+        <div class="gazeta-wrapper">
+            <div class="loading"></div>
+        </div>
       `;
   
       try {
@@ -116,9 +119,11 @@ class GazetaAdWidget extends HTMLElement {
       } catch (e) {
         this.shadowRoot.innerHTML = `
           <style>${rootStyles}</style>
-          <div class="gazeta-wrapper error-state" style="border-color: #ef4444; background: #1e1b4b; color: #fca5a5;">
-            <div class="error-title">Gazeta Ad Error</div>
-            <div class="error-desc">${e.message}</div>
+          <div class="gazeta-wrapper">
+            <div class="error-state" style="border-color: #ef4444; background: #1e1b4b; color: #fca5a5;">
+              <div class="error-title">Gazeta Ad Error</div>
+              <div class="error-desc">${e.message}</div>
+            </div>
           </div>
         `;
       }
@@ -142,19 +147,13 @@ class GazetaAdWidget extends HTMLElement {
     }
   
     renderAd(ad, appId, rootStyles) {
-      // Scalable SVG Icons
-      const playIcon = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
-      const pauseIcon = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
-      const volumeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
       const mutedIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+      const volumeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
       const closeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
       const infoIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
   
       const isVideo = ad.file_type === 'video';
       
-      // Dual-Layer Rendering Technique
-      // Background layer is blurred and covers the container completely.
-      // Foreground layer contains the content crisply, avoiding ugly letterboxing.
       const mediaHtml = isVideo 
           ? `
              <video class="media-bg" src="${ad.media_url}" autoplay loop muted playsinline preload="auto"></video>
@@ -169,6 +168,7 @@ class GazetaAdWidget extends HTMLElement {
         <style>
           ${rootStyles}
           
+          /* Edge-to-Edge Media Layer */
           .media-container {
             position: absolute;
             inset: 0;
@@ -179,16 +179,15 @@ class GazetaAdWidget extends HTMLElement {
             background: #000;
           }
           
-          /* Dual Layer Implementation */
           .media-bg {
             position: absolute;
             inset: -10%; 
             width: 120%;
             height: 120%;
             object-fit: cover;
-            filter: blur(24px) brightness(0.5);
+            filter: blur(28px) brightness(0.4);
             z-index: 1;
-            transform: translate3d(0,0,0); /* GPU Acceleration */
+            transform: translate3d(0,0,0);
           }
           
           .media-fg {
@@ -201,41 +200,45 @@ class GazetaAdWidget extends HTMLElement {
             transform: translate3d(0,0,0);
           }
   
+          /* Floating UI Overlay Layer */
           .ui-layer {
-            position: relative;
+            position: absolute;
+            inset: 0;
             z-index: 10;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            width: 100%;
-            pointer-events: none; /* Let clicks pass through to media if needed */
+            justify-content: space-between;
+            pointer-events: none;
           }
   
+          /* Top Pinned Bar */
           .top-bar {
-            padding: var(--gzt-safe-top) var(--gzt-safe-right) var(--gzt-spacing) var(--gzt-safe-left);
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+            width: 100%;
+            padding: var(--gzt-safe-top) var(--gzt-safe-right) calc(var(--gzt-spacing) * 2) var(--gzt-safe-left);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            pointer-events: auto;
           }
           
           .brand-badge {
             display: flex;
             align-items: center;
             gap: calc(var(--gzt-spacing) * 0.5);
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-radius: 9999px;
             padding: calc(var(--gzt-spacing) * 0.25) calc(var(--gzt-spacing) * 0.75) calc(var(--gzt-spacing) * 0.25) calc(var(--gzt-spacing) * 0.25);
-            pointer-events: auto;
+            border: 1px solid rgba(255,255,255,0.1);
           }
           
           .brand-icon {
             width: var(--gzt-icon-size);
             height: var(--gzt-icon-size);
             border-radius: 50%;
-            background: #114B5F;
+            background: rgba(255,255,255,0.2);
             color: white;
             display: flex;
             align-items: center;
@@ -245,158 +248,87 @@ class GazetaAdWidget extends HTMLElement {
             text-transform: uppercase;
           }
           
-          .brand-name { color: white; font-size: var(--gzt-brand); font-weight: 700; }
+          .brand-name { color: white; font-size: var(--gzt-brand); font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
           .sponsored-tag { 
-            color: rgba(255,255,255,0.85); 
+            color: rgba(255,255,255,0.9); 
             font-size: calc(var(--gzt-brand) * 0.85); 
             background: rgba(255,255,255,0.2); 
             padding: 2px 6px; 
-            border-radius: 6px; 
+            border-radius: 4px; 
             text-transform: uppercase; 
             font-weight: 800; 
             letter-spacing: 0.5px; 
           }
           
-          .top-actions { display: flex; gap: calc(var(--gzt-spacing) * 0.5); pointer-events: auto; }
+          .top-actions { display: flex; gap: calc(var(--gzt-spacing) * 0.5); }
           .circle-btn {
             width: var(--gzt-circle-btn);
             height: var(--gzt-circle-btn);
             border-radius: 50%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             color: white;
-            border: none;
+            border: 1px solid rgba(255,255,255,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s;
           }
-          .circle-btn:hover { background: rgba(0,0,0,0.8); transform: scale(1.05); }
+          .circle-btn:hover { background: rgba(0,0,0,0.6); transform: scale(1.05); }
           .circle-btn:active { transform: scale(0.95); }
-          .circle-btn svg { width: 50%; height: 50%; }
+          .circle-btn svg { width: 50%; height: 50%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
   
-          .spacer { flex: 1; }
-  
+          /* Bottom Pinned Bar */
           .bottom-bar {
-            padding: calc(var(--gzt-spacing) * 3) var(--gzt-safe-right) var(--gzt-safe-bottom) var(--gzt-safe-left);
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
+            width: 100%;
+            padding: calc(var(--gzt-spacing) * 4) var(--gzt-safe-right) var(--gzt-safe-bottom) var(--gzt-safe-left);
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
             display: flex;
             flex-direction: column;
             gap: var(--gzt-spacing);
+            pointer-events: auto;
           }
           
-          .ad-info { color: white; }
+          .ad-info { color: white; display: flex; flex-direction: column; gap: calc(var(--gzt-spacing) * 0.4); }
           .ad-title { 
             font-size: var(--gzt-title); 
             font-weight: 800; 
-            margin: 0 0 calc(var(--gzt-spacing) * 0.3); 
+            margin: 0; 
             line-height: 1.2;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
           }
           .ad-desc { 
             font-size: var(--gzt-body); 
-            color: rgba(255,255,255,0.9); 
+            color: rgba(255,255,255,0.95); 
             margin: 0; 
             line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            /* Natural wrapping without artificial truncation to fit any screen safely */
           }
           
           .cta-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: calc(var(--gzt-spacing) * 0.5);
             width: 100%;
-            background: #114B5F;
-            color: white;
-            font-weight: 700;
+            background: #fff;
+            color: #000;
+            font-weight: 800;
             font-size: var(--gzt-btn-text);
-            padding: calc(var(--gzt-spacing) * 0.8) var(--gzt-spacing);
-            border-radius: calc(var(--gzt-radius) * 0.75);
+            padding: calc(var(--gzt-spacing) * 0.9) var(--gzt-spacing);
+            border-radius: var(--gzt-radius);
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(17, 75, 95, 0.4);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s;
             text-decoration: none;
-            pointer-events: auto;
           }
-          .cta-btn:hover { background: #1a627a; transform: translate3d(0, -2px, 0); box-shadow: 0 8px 20px rgba(17, 75, 95, 0.5); }
+          .cta-btn:hover { background: #f1f5f9; transform: translate3d(0, -2px, 0); }
           .cta-btn:active { transform: translate3d(0, 1px, 0) scale(0.98); }
           .cta-btn svg { width: calc(var(--gzt-btn-text) * 1.2); height: calc(var(--gzt-btn-text) * 1.2); }
-
-          /* =======================================================
-             CONTAINER QUERIES - INTELLIGENT ADAPTIVE LAYOUTS
-             ======================================================= */
-          
-          /* Horizontal / Landscape Layout (Tablets, Desktop Embedded) */
-          @container gazeta-ad (min-width: 500px) {
-            .gazeta-wrapper {
-              flex-direction: row;
-              aspect-ratio: auto;
-              height: auto;
-              min-height: 200px;
-            }
-            .media-container {
-              position: relative;
-              flex: 1 1 50%;
-              height: 100%;
-            }
-            .media-fg {
-              /* In horizontal layout, cover the left half smoothly */
-              object-fit: cover;
-            }
-            .ui-layer {
-              flex: 1 1 50%;
-              background: #0f172a; /* Solid background for text half */
-              height: 100%;
-            }
-            .top-bar {
-              position: absolute;
-              top: 0; left: 0; right: 0;
-              width: 100%;
-              z-index: 20;
-            }
-            .spacer { display: none; }
-            .bottom-bar {
-              background: none;
-              padding: var(--gzt-safe-top) var(--gzt-safe-right) var(--gzt-safe-bottom) var(--gzt-spacing);
-              height: 100%;
-              justify-content: center;
-            }
-            .ad-desc { -webkit-line-clamp: 4; }
-          }
-
-          /* Micro-Banner Layout (e.g. 320x50 or 728x90 sticky footer) */
-          @container gazeta-ad (max-height: 150px) {
-            .gazeta-wrapper {
-              flex-direction: row;
-              border-radius: 0; /* Banners usually bleed to edges */
-            }
-            .media-container {
-              position: relative;
-              flex: 0 0 100px;
-            }
-            .media-fg { object-fit: cover; }
-            .top-bar { display: none; }
-            .spacer { display: none; }
-            .bottom-bar {
-              background: #0f172a;
-              flex: 1;
-              flex-direction: row;
-              align-items: center;
-              justify-content: space-between;
-              padding: var(--gzt-spacing);
-            }
-            .ad-title { margin: 0; -webkit-line-clamp: 1; font-size: calc(var(--gzt-title) * 0.8); }
-            .ad-desc { display: none; }
-            .cta-btn { width: auto; padding: calc(var(--gzt-spacing)*0.5) var(--gzt-spacing); }
-          }
         </style>
   
         <div class="gazeta-wrapper">
@@ -417,11 +349,9 @@ class GazetaAdWidget extends HTMLElement {
                     </div>
                 </div>
         
-                <div class="spacer"></div>
-        
                 <div class="bottom-bar">
                     <div class="ad-info">
-                        <h4 class="ad-title">Sponsored Content</h4>
+                        <h4 class="ad-title">Sponsored</h4>
                         <p class="ad-desc">${ad.ad_copy_description || ''}</p>
                     </div>
                     <a href="${ad.destination_url}" target="_blank" class="cta-btn">
@@ -433,34 +363,16 @@ class GazetaAdWidget extends HTMLElement {
       `;
   
       const wrapper = this.shadowRoot.querySelector('.gazeta-wrapper');
-      const fgMedia = this.shadowRoot.getElementById('adMedia');
-
-      // Dynamically detect intrinsic aspect ratio to perfectly fit vertical/square videos
-      const updateAspectRatio = (width, height) => {
-        if (width > 0 && height > 0) {
-          // Setting the container aspect ratio allows it to perfectly wrap the media
-          // if it hasn't been constrained by an @container layout query.
-          wrapper.style.aspectRatio = `${width} / ${height}`;
-        }
-      };
-
+      
       if (isVideo) {
-        fgMedia.addEventListener('loadedmetadata', () => {
-          updateAspectRatio(fgMedia.videoWidth, fgMedia.videoHeight);
-        });
-        
+        const fgMedia = this.shadowRoot.getElementById('adMedia');
         const muteBtn = this.shadowRoot.getElementById('muteBtn');
         let isMuted = true;
         muteBtn.addEventListener('click', () => {
           isMuted = !isMuted;
           fgMedia.muted = isMuted;
-          // Apply to background layer as well, just in case
           this.shadowRoot.querySelectorAll('video').forEach(v => v.muted = isMuted);
           muteBtn.innerHTML = isMuted ? mutedIcon : volumeIcon;
-        });
-      } else {
-        fgMedia.addEventListener('load', () => {
-          updateAspectRatio(fgMedia.naturalWidth, fgMedia.naturalHeight);
         });
       }
 
