@@ -16,8 +16,6 @@ export function IntegrationDocs() {
   
   const advancedSnippet = `<gazeta-ad 
   app-id="YOUR_APP_ID"
-  width="100%" 
-  height="250px"
   target-age="18-35" 
   app-category="finance"
 ></gazeta-ad>`;
@@ -118,30 +116,11 @@ export function IntegrationDocs() {
           </div>
           
           <p className="text-zinc-600 dark:text-zinc-400 mb-8 max-w-3xl leading-relaxed">
-            The <code className="font-mono text-sm bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-800 dark:text-zinc-200">&lt;gazeta-ad&gt;</code> element supports several optional HTML attributes that allow you to control the exact sizing and demographic targeting of the ad. Passing specific demographic data helps our engine serve higher-converting (and higher-paying) ads to your users.
+            The <code className="font-mono text-sm bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-800 dark:text-zinc-200">&lt;gazeta-ad&gt;</code> element supports several optional HTML attributes that allow you to control the exact demographic targeting of the ad. We use smart layout engines so you don't need to pass width or height properties—the ad will automatically size itself perfectly to fit its parent container and the user's screen.
           </p>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
-              <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
-                <div className="flex items-start justify-between mb-2">
-                  <code className="text-[13px] font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20 px-2 py-1 rounded border border-brand-100 dark:border-brand-800/50">width</code>
-                  <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded">Layout</span>
-                </div>
-                <p className="text-[13px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                  Controls the width of the ad container. Supports pixels (e.g., <code className="text-zinc-700 dark:text-zinc-300 font-mono">300px</code>) or percentages (e.g., <code className="text-zinc-700 dark:text-zinc-300 font-mono">100%</code>). If omitted, defaults to <code className="text-zinc-700 dark:text-zinc-300 font-mono">300px</code>. The SDK guarantees mobile responsiveness even if you provide static pixel values.
-                </p>
-              </div>
-
-              <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
-                <div className="flex items-start justify-between mb-2">
-                  <code className="text-[13px] font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20 px-2 py-1 rounded border border-brand-100 dark:border-brand-800/50">height</code>
-                  <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded">Layout</span>
-                </div>
-                <p className="text-[13px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                  Controls the height of the ad container. Standard sizes include <code className="text-zinc-700 dark:text-zinc-300 font-mono">600px</code> for half-page or <code className="text-zinc-700 dark:text-zinc-300 font-mono">250px</code> for medium rectangles. Defaults to <code className="text-zinc-700 dark:text-zinc-300 font-mono">600px</code> if omitted.
-                </p>
-              </div>
               
               <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
                 <div className="flex items-start justify-between mb-2">
@@ -172,8 +151,6 @@ export function IntegrationDocs() {
               <pre className="text-[13px] font-mono text-zinc-300 overflow-x-auto whitespace-pre-wrap flex-1 leading-relaxed">
                 <span className="text-brand-400">&lt;gazeta-ad</span>{'\n'}
                 <span className="text-emerald-300">  app-id=</span><span className="text-amber-300">"YOUR_APP_ID"</span>{'\n'}
-                <span className="text-emerald-300">  width=</span><span className="text-amber-300">"100%"</span>{'\n'}
-                <span className="text-emerald-300">  height=</span><span className="text-amber-300">"250px"</span>{'\n'}
                 <span className="text-emerald-300">  target-age=</span><span className="text-amber-300">"18-35"</span>{'\n'}
                 <span className="text-emerald-300">  app-category=</span><span className="text-amber-300">"finance"</span>{'\n'}
                 <span className="text-brand-400">&gt;&lt;/gazeta-ad&gt;</span>

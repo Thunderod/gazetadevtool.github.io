@@ -9,27 +9,15 @@ class GazetaAdWidget extends HTMLElement {
       const targetAge = this.getAttribute('target-age') || 'all';
       const appCategory = this.getAttribute('app-category') || 'all';
       
-      const widthAttr = this.getAttribute('width') || '300px';
-      const heightAttr = this.getAttribute('height') || '600px';
-  
-      // Safe parsing for CSS
-      const wMatch = widthAttr.match(/(\d+)/);
-      const hMatch = heightAttr.match(/(\d+)/);
-      const parsedWidth = wMatch ? parseInt(wMatch[1]) : 300;
-      const parsedHeight = hMatch ? parseInt(hMatch[1]) : 600;
-      
-      // Prevent bizarre aspect ratios on mobile if 100% is passed
-      const isFluidWidth = widthAttr.includes('%');
-      const aspectRatio = isFluidWidth ? '300 / 600' : `${parsedWidth} / ${parsedHeight}`;
-
+      // Auto-sizing magic: The SDK handles optimal ad sizing automatically
+      // so developers don't have to guess or write media queries.
       const containerStyle = `
         font-family: system-ui, -apple-system, sans-serif;
         width: 100%;
-        max-width: ${isFluidWidth ? '100%' : widthAttr};
-        aspect-ratio: ${aspectRatio};
-        height: auto;
+        max-width: 400px;
+        aspect-ratio: 4 / 5;
+        max-height: 75vh;
         min-height: 250px;
-        max-height: 85vh;
         border-radius: 16px;
         overflow: hidden;
         background: #0f172a;
@@ -44,6 +32,7 @@ class GazetaAdWidget extends HTMLElement {
 
       if (!appId || appId === 'YOUR_APP_ID') {
           this.shadowRoot.innerHTML = `
+            <style>:host { display: block; width: 100%; }</style>
             <div style="${containerStyle}; border: 2px dashed #ef4444; background: #fee2e2; color: #991b1b; padding: 1.5rem; text-align: center; flex-direction: column; aspect-ratio: auto; min-height: 150px;">
               <strong style="font-size: 16px; margin-bottom: 8px;">Gazeta SDK Error</strong>
               <span style="font-size: 14px;">Please replace "YOUR_APP_ID" with your actual App ID from the dashboard.</span>
@@ -54,6 +43,10 @@ class GazetaAdWidget extends HTMLElement {
 
       this.shadowRoot.innerHTML = `
         <style>
+            :host { 
+              display: block; 
+              width: 100%; 
+            }
             @keyframes shimmer {
                 0% { background-position: -1000px 0; }
                 100% { background-position: 1000px 0; }
@@ -92,6 +85,7 @@ class GazetaAdWidget extends HTMLElement {
         this.renderAd(ad, containerStyle, appId);
       } catch (e) {
         this.shadowRoot.innerHTML = `
+          <style>:host { display: block; width: 100%; }</style>
           <div style="${containerStyle}; border: 1px solid #ef4444; background: #1e1b4b; color: #fca5a5; padding: 1.5rem; text-align: center; flex-direction: column; aspect-ratio: auto; min-height: 150px;">
             <strong style="margin-bottom: 8px;">Gazeta Ad Error</strong>
             <span style="font-size: 13px;">${e.message}</span>
@@ -135,7 +129,7 @@ class GazetaAdWidget extends HTMLElement {
       this.shadowRoot.innerHTML = `
         <style>
           :host {
-            display: inline-block;
+            display: block;
             width: 100%;
           }
           .gazeta-ad-container {
