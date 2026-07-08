@@ -1,4 +1,4 @@
-import { Terminal, Copy, CheckCircle, Code, Settings2, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Terminal, Copy, CheckCircle, Code, Settings2, ShieldCheck, AlertCircle, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -168,6 +168,36 @@ export function IntegrationDocs() {
                 </button>
               </div>
             </div>
+          </div>
+        </motion.div>
+
+        {/* Pre-fetching Section */}
+        <motion.div variants={itemVariants} className="bg-indigo-50 dark:bg-indigo-900/20 p-8 rounded-3xl border border-indigo-200 dark:border-indigo-800/50">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2.5 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl">
+              <Zap className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Zero-Latency Pre-fetching (New)</h3>
+          </div>
+          
+          <p className="text-zinc-600 dark:text-zinc-400 mb-6 max-w-3xl leading-relaxed">
+            For the best possible user experience, you can initialize the SDK early (e.g., on your splash screen or loading state). This will silently pre-fetch a pool of ads and cache their heavy video/image assets in the background. When the <code className="font-mono text-sm">gazeta-ad</code> element is finally rendered, it will appear instantly with <strong>0ms network latency</strong>.
+          </p>
+
+          <div className="bg-zinc-950 rounded-2xl p-5 border border-zinc-800 shadow-inner flex flex-col">
+            <div className="flex items-center gap-2 mb-4">
+              <Code className="h-4 w-4 text-zinc-500" />
+              <span className="text-xs font-mono text-zinc-400">Initialize Early (Optional but Recommended)</span>
+            </div>
+            <pre className="text-[13px] font-mono text-zinc-300 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+<span className="text-brand-400">&lt;script&gt;</span>{'\n'}
+<span className="text-zinc-300">  </span><span className="text-emerald-300">window.Gazeta.init</span><span className="text-zinc-300">({'{'}</span>{'\n'}
+<span className="text-zinc-300">    appId: </span><span className="text-amber-300">'YOUR_APP_ID'</span><span className="text-zinc-300">,</span>{'\n'}
+<span className="text-zinc-300">    targetAge: </span><span className="text-amber-300">'18-35'</span><span className="text-zinc-300">, </span><span className="text-zinc-500">// Optional</span>{'\n'}
+<span className="text-zinc-300">    appCategory: </span><span className="text-amber-300">'finance'</span><span className="text-zinc-300"> </span><span className="text-zinc-500">// Optional</span>{'\n'}
+<span className="text-zinc-300">  {'}'});</span>{'\n'}
+<span className="text-brand-400">&lt;/script&gt;</span>
+            </pre>
           </div>
         </motion.div>
 

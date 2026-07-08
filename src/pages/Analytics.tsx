@@ -15,9 +15,10 @@ export function Analytics() {
       if (!user) return;
       try {
         setIsLoading(true);
+        // Added video metrics to the query
         const { data: statsData, error } = await supabase
           .from('daily_stats')
-          .select('date, requests, impressions, clicks')
+          .select('date, requests, impressions, clicks, video_start, video_25_percent, video_50_percent, video_75_percent, video_complete')
           .order('date', { ascending: true })
           .limit(30);
 
@@ -25,11 +26,26 @@ export function Analytics() {
 
         const grouped = (statsData || []).reduce((acc: any, curr: any) => {
           if (!acc[curr.date]) {
-            acc[curr.date] = { date: curr.date, requests: 0, impressions: 0, clicks: 0 };
+            acc[curr.date] = { 
+              date: curr.date, 
+              requests: 0, 
+              impressions: 0, 
+              clicks: 0,
+              video_start: 0,
+              video_25_percent: 0,
+              video_50_percent: 0,
+              video_75_percent: 0,
+              video_complete: 0
+            };
           }
-          acc[curr.date].requests += curr.requests;
-          acc[curr.date].impressions += curr.impressions;
-          acc[curr.date].clicks += curr.clicks;
+          acc[curr.date].requests += curr.requests || 0;
+          acc[curr.date].impressions += curr.impressions || 0;
+          acc[curr.date].clicks += curr.clicks || 0;
+          acc[curr.date].video_start += curr.video_start || 0;
+          acc[curr.date].video_25_percent += curr.video_25_percent || 0;
+          acc[curr.date].video_50_percent += curr.video_50_percent || 0;
+          acc[curr.date].video_75_percent += curr.video_75_percent || 0;
+          acc[curr.date].video_complete += curr.video_complete || 0;
           return acc;
         }, {});
 
@@ -62,7 +78,7 @@ export function Analytics() {
         className="rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 shadow-sm dark:shadow-zinc-950/50"
       >
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">Requests vs Impressions vs Clicks</h2>
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">Ad Performance & Video Retention</h2>
           <select className="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 text-sm font-medium text-zinc-700 dark:text-zinc-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all cursor-pointer">
             <option>Last 7 Days</option>
             <option>Last 30 Days</option>
@@ -89,9 +105,11 @@ export function Analytics() {
                   cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                 />
                 <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
-                <Bar dataKey="requests" name="Ad Requests" fill="#52525b" radius={[4, 4, 0, 0]} barSize={20} />
-                <Bar dataKey="impressions" name="Impressions" fill="#114B5F" radius={[4, 4, 0, 0]} barSize={20} />
-                <Bar dataKey="clicks" name="Clicks" fill="#10b981" radius={[4, 4, 0, 0]} barSize={20} />
+                <Bar dataKey="impressions" name="Impressions" fill="#1e293b" radius={[4, 4, 0, 0]} barSize={12} />
+                <Bar dataKey="clicks" name="Clicks" fill="#10b981" radius={[4, 4, 0, 0]} barSize={12} />
+                <Bar dataKey="video_start" name="Video Start" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={12} />
+                <Bar dataKey="video_50_percent" name="Video 50%" fill="#8b5cf6" radius={[4, 4, 0, 0]} barSize={12} />
+                <Bar dataKey="video_complete" name="Video Complete" fill="#f59e0b" radius={[4, 4, 0, 0]} barSize={12} />
               </BarChart>
             </ResponsiveContainer>
           )}
