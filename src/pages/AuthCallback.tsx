@@ -38,7 +38,7 @@ export function AuthCallback() {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 font-sans">
-        <div className="w-full max-w-md bg-white p-8 rounded-3xl border border-rose-200 text-center shadow-sm">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-rose-200 text-center shadow-sm">
           <h2 className="text-xl font-bold text-slate-900 mb-2">Authentication Error</h2>
           <p className="text-slate-500 mb-6">{error}</p>
           <button 

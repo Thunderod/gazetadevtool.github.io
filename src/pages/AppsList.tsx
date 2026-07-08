@@ -193,7 +193,7 @@ export function AppsList() {
         </div>
       )}
 
-      <div className="rounded-3xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+      <div className="rounded-3xl border border-slate-200 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">
         <table className="w-full text-left text-sm text-slate-600">
           <thead className="bg-slate-50 text-[11px] uppercase tracking-widest text-slate-400 border-b border-slate-200 font-bold">
             <tr>
@@ -273,8 +273,8 @@ export function AppsList() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center p-6 border-b border-slate-100 sticky top-0 bg-white z-10">
+          <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-6 border-b border-slate-100 sticky top-0 bg-white dark:bg-zinc-900 z-10">
               <h2 className="text-lg font-semibold text-slate-900">
                 {createdAppId ? 'App Created' : 'Add New App'}
               </h2>
@@ -298,7 +298,7 @@ export function AppsList() {
                 
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-8">
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 text-left">App ID</p>
-                  <div className="flex items-center justify-between gap-3 bg-white border border-slate-200 p-3 rounded-xl">
+                  <div className="flex items-center justify-between gap-3 bg-white dark:bg-zinc-900 border border-slate-200 p-3 rounded-xl">
                     <code className="text-sm font-mono text-indigo-600 truncate">{createdAppId}</code>
                     <button 
                       onClick={() => navigator.clipboard.writeText(createdAppId)}
@@ -326,7 +326,7 @@ export function AppsList() {
                     value={newAppName}
                     onChange={(e) => setNewAppName(e.target.value)}
                     placeholder="e.g. Skyward RPG"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:bg-white dark:bg-zinc-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                     required
                   />
                 </div>
@@ -342,7 +342,7 @@ export function AppsList() {
                         className={`flex flex-col items-center justify-center py-3 rounded-xl border ${
                           newAppPlatform === p 
                             ? 'border-indigo-600 bg-indigo-50 text-indigo-700' 
-                            : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50'
+                            : 'border-slate-200 bg-white dark:bg-zinc-900 text-slate-500 hover:bg-slate-50'
                         } transition-colors`}
                       >
                         <PlatformIcon platform={p} />
@@ -364,7 +364,7 @@ export function AppsList() {
                           className={`py-2 rounded-xl border text-sm font-medium capitalize ${
                             newAppCategory === c 
                               ? 'border-indigo-600 bg-indigo-50 text-indigo-700' 
-                              : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50'
+                              : 'border-slate-200 bg-white dark:bg-zinc-900 text-slate-500 hover:bg-slate-50'
                           } transition-colors`}
                         >
                           {c}
@@ -379,7 +379,7 @@ export function AppsList() {
                   <select
                     value={newAppGenre}
                     onChange={(e) => setNewAppGenre(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all capitalize"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 focus:bg-white dark:bg-zinc-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all capitalize"
                     required
                   >
                     {newAppCategory === 'game' ? (
@@ -407,7 +407,7 @@ export function AppsList() {
                         className={`flex items-center p-3 border rounded-xl cursor-pointer transition-colors ${
                           newAppFormats.includes(f) 
                             ? 'border-indigo-600 bg-indigo-50 text-indigo-700' 
-                            : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50'
+                            : 'border-slate-200 bg-white dark:bg-zinc-900 text-slate-500 hover:bg-slate-50'
                         }`}
                       >
                         <input
@@ -430,7 +430,7 @@ export function AppsList() {
                   <select
                     value={newAppAudience}
                     onChange={(e) => setNewAppAudience(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 focus:bg-white dark:bg-zinc-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                     required
                   >
                     <option value="everyone">Everyone</option>
@@ -449,7 +449,7 @@ export function AppsList() {
                     value={newAppBundle}
                     onChange={(e) => setNewAppBundle(e.target.value)}
                     placeholder={newAppPlatform === 'web' ? 'e.g. example.com' : 'e.g. com.studio.game'}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:bg-white dark:bg-zinc-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono"
                     required
                   />
                 </div>
@@ -478,7 +478,7 @@ export function AppsList() {
       )}
       {isDeleteModalOpen && appToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden text-center p-8">
+          <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden text-center p-8">
             <div className="mx-auto w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-4">
               <AlertCircle className="h-8 w-8 text-rose-600" />
             </div>

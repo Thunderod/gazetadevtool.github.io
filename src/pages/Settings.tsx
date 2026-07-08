@@ -64,7 +64,7 @@ export function Settings() {
 
         {/* Content Area */}
         <div className="flex-1">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-zinc-900 dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <form onSubmit={handleSave} className="p-8">
               
               {/* PROFILE TAB */}
@@ -82,7 +82,7 @@ export function Settings() {
                         </span>
                       )}
                     </div>
-                    <button type="button" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                    <button type="button" className="px-4 py-2 bg-white dark:bg-zinc-900 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
                       Change Avatar
                     </button>
                   </div>
@@ -93,7 +93,7 @@ export function Settings() {
                       <input 
                         type="text" 
                         defaultValue={user?.user_metadata?.full_name || ''}
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:bg-white dark:bg-zinc-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                       />
                     </div>
                     <div>
@@ -119,7 +119,7 @@ export function Settings() {
                           className={`px-4 py-2 rounded-lg text-sm font-medium capitalize border transition-all ${
                             theme === t 
                               ? 'bg-brand-50 border-brand-200 text-brand-700 dark:bg-brand-900/30 dark:border-brand-700 dark:text-brand-300' 
-                              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800'
+                              : 'bg-white dark:bg-zinc-900 border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800'
                           }`}
                         >
                           {t}
@@ -176,7 +176,7 @@ export function Settings() {
                   <div className="p-6 bg-indigo-50 rounded-2xl border border-indigo-100 mb-6">
                     <h3 className="font-semibold text-indigo-900 mb-1">Publisher Account ID</h3>
                     <div className="flex items-center justify-between gap-4">
-                      <code className="flex-1 bg-white px-3 py-2 rounded-lg border border-indigo-200 text-sm text-indigo-700 font-mono break-all">
+                      <code className="flex-1 bg-white dark:bg-zinc-900 px-3 py-2 rounded-lg border border-indigo-200 text-sm text-indigo-700 font-mono break-all">
                         {user?.id}
                       </code>
                     </div>
