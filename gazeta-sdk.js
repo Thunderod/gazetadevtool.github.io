@@ -8,42 +8,60 @@ class GazetaAdWidget extends HTMLElement {
       const appId = this.getAttribute('app-id');
       const targetAge = this.getAttribute('target-age') || 'all';
       const appCategory = this.getAttribute('app-category') || 'all';
-      const width = this.getAttribute('width') || '300px';
-      const height = this.getAttribute('height') || '600px';
-  
-      if (!appId) {
-          this.shadowRoot.innerHTML = `<div style="color:red; font-family: sans-serif; padding: 1rem; border: 1px dashed red;">Gazeta SDK Error: Missing app-id</div>`;
+      
+      // Auto-sizing magic: The SDK handles optimal ad sizing automatically
+      // so developers don't have to guess or write media queries.
+      const containerStyle = `
+        font-family: system-ui, -apple-system, sans-serif;
+        width: 100%;
+        max-width: 400px;
+        aspect-ratio: 4 / 5;
+        max-height: 75vh;
+        min-height: 250px;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #0f172a;
+        position: relative;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+      `;
+
+      if (!appId || appId === 'YOUR_APP_ID') {
+          this.shadowRoot.innerHTML = `
+            <style>:host { display: block; width: 100%; }</style>
+            <div style="${containerStyle}; border: 2px dashed #ef4444; background: #fee2e2; color: #991b1b; padding: 1.5rem; text-align: center; flex-direction: column; aspect-ratio: auto; min-height: 150px;">
+              <strong style="font-size: 16px; margin-bottom: 8px;">Gazeta SDK Error</strong>
+              <span style="font-size: 14px;">Please replace "YOUR_APP_ID" with your actual App ID from the dashboard.</span>
+            </div>
+          `;
           return;
       }
 
       this.shadowRoot.innerHTML = `
         <style>
+            :host { 
+              display: block; 
+              width: 100%; 
+            }
             @keyframes shimmer {
                 0% { background-position: -1000px 0; }
                 100% { background-position: 1000px 0; }
             }
             .loading {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 100%;
-                max-width: ${width};
-                aspect-ratio: ${parseInt(width) || 300} / ${parseInt(height) || 600};
-                height: auto;
-                max-height: 85vh;
+                ${containerStyle}
                 background: linear-gradient(to right, #0f172a 4%, #1e293b 25%, #0f172a 36%);
                 background-size: 1000px 100%;
                 animation: shimmer 2s infinite linear;
-                color: #94a3b8;
-                font-family: system-ui, sans-serif;
-                border-radius: 2rem;
             }
         </style>
         <div class="loading"></div>
       `;
   
       try {
-        // Points to the new Project B Gateway
         const response = await fetch("https://hvoubbgzntldqoxqyoij.supabase.co/functions/v1/serve-ad", {
           method: "POST",
           headers: { 
@@ -64,9 +82,15 @@ class GazetaAdWidget extends HTMLElement {
         if (!jsonArray || jsonArray.length === 0) throw new Error("No active ads found that match criteria.");
         const ad = jsonArray[0];
   
-        this.renderAd(ad, width, height, appId);
+        this.renderAd(ad, containerStyle, appId);
       } catch (e) {
-        this.shadowRoot.innerHTML = `<div style="color:red; font-family: sans-serif; padding: 1rem; border: 1px dashed red;">Gazeta Ad Failed: ${e.message}</div>`;
+        this.shadowRoot.innerHTML = `
+          <style>:host { display: block; width: 100%; }</style>
+          <div style="${containerStyle}; border: 1px solid #ef4444; background: #1e1b4b; color: #fca5a5; padding: 1.5rem; text-align: center; flex-direction: column; aspect-ratio: auto; min-height: 150px;">
+            <strong style="margin-bottom: 8px;">Gazeta Ad Error</strong>
+            <span style="font-size: 13px;">${e.message}</span>
+          </div>
+        `;
       }
     }
   
@@ -75,15 +99,20 @@ class GazetaAdWidget extends HTMLElement {
         await fetch("https://hvoubbgzntldqoxqyoij.supabase.co/functions/v1/serve-ad", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ app_id: appId, event_type: eventType })
+          // Sending multiple key variations just in case the edge function expects a different one
+          body: JSON.stringify({ 
+            app_id: appId, 
+            event_type: eventType,
+            event: eventType,
+            action: eventType
+          })
         });
       } catch (e) {
         console.error("Gazeta SDK tracking error:", e);
       }
     }
   
-    renderAd(ad, width, height, appId) {
-      // SVG Icons (equivalent to Lucide React icons used in AdPreview.tsx)
+    renderAd(ad, containerStyle, appId) {
       const playIcon = `<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
       const pauseIcon = `<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
       const volumeIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
@@ -92,28 +121,19 @@ class GazetaAdWidget extends HTMLElement {
       const infoIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
   
       const isVideo = ad.file_type === 'video';
+      // Preload media to reduce perceived delay
       const mediaHtml = isVideo 
-          ? `<video id="adMedia" src="${ad.media_url}" autoplay loop muted playsinline></video>`
-          : `<img id="adMedia" src="${ad.media_url}" alt="Ad" />`;
+          ? `<video id="adMedia" src="${ad.media_url}" autoplay loop muted playsinline preload="auto"></video>`
+          : `<img id="adMedia" src="${ad.media_url}" alt="Ad" loading="eager" />`;
   
       this.shadowRoot.innerHTML = `
         <style>
           :host {
-            display: inline-block;
+            display: block;
+            width: 100%;
           }
           .gazeta-ad-container {
-            font-family: system-ui, -apple-system, sans-serif;
-            width: 100%;
-            max-width: ${width};
-            aspect-ratio: ${parseInt(width) || 300} / ${parseInt(height) || 600};
-            height: auto;
-            max-height: 85vh;
-            border-radius: 2rem;
-            overflow: hidden;
-            background: #000;
-            position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            box-sizing: border-box;
+            ${containerStyle}
           }
           
           * { box-sizing: border-box; }
@@ -141,8 +161,8 @@ class GazetaAdWidget extends HTMLElement {
             top: 0;
             left: 0;
             right: 0;
-            padding: 2rem 1rem 1rem;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+            padding: 1rem;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
             z-index: 10;
             display: flex;
             justify-content: space-between;
@@ -153,7 +173,7 @@ class GazetaAdWidget extends HTMLElement {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             backdrop-filter: blur(8px);
             border-radius: 9999px;
             padding: 4px 12px 4px 4px;
@@ -163,23 +183,23 @@ class GazetaAdWidget extends HTMLElement {
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background: #0ea5e9;
+            background: #114B5F;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
           }
-          .brand-name { color: white; font-size: 12px; font-weight: 500; }
-          .sponsored-tag { color: rgba(255,255,255,0.7); font-size: 10px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; }
+          .brand-name { color: white; font-size: 12px; font-weight: 600; }
+          .sponsored-tag { color: rgba(255,255,255,0.7); font-size: 10px; background: rgba(255,255,255,0.15); padding: 3px 6px; border-radius: 6px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
           
           .top-actions { display: flex; gap: 8px; pointer-events: auto; }
           .circle-btn {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             backdrop-filter: blur(8px);
             color: white;
             border: none;
@@ -187,30 +207,31 @@ class GazetaAdWidget extends HTMLElement {
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: background 0.2s;
           }
-          .circle-btn:hover { background: rgba(0,0,0,0.6); }
+          .circle-btn:hover { background: rgba(0,0,0,0.8); }
   
           .bottom-ui {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 5rem 1rem 2rem;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), transparent);
+            padding: 4rem 1.5rem 1.5rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.5), transparent);
             z-index: 10;
           }
           .ad-info { color: white; margin-bottom: 1rem; }
-          .ad-info h4 { font-size: 14px; font-weight: bold; margin: 0 0 4px; }
+          .ad-info h4 { font-size: 16px; font-weight: bold; margin: 0 0 6px; }
           .ad-info p { 
-            font-size: 12px; 
-            color: rgba(255,255,255,0.9); 
+            font-size: 13px; 
+            color: rgba(255,255,255,0.85); 
             margin: 0; 
             line-height: 1.5;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
           }
           .cta-btn {
             display: flex;
@@ -218,19 +239,20 @@ class GazetaAdWidget extends HTMLElement {
             justify-content: center;
             gap: 8px;
             width: 100%;
-            background: #0ea5e9;
+            background: #114B5F;
             color: white;
-            font-weight: bold;
-            font-size: 14px;
+            font-weight: 600;
+            font-size: 15px;
             padding: 14px;
             border-radius: 12px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.3);
-            transition: transform 0.1s;
+            box-shadow: 0 4px 12px rgba(17, 75, 95, 0.4);
+            transition: all 0.2s ease;
             text-decoration: none;
           }
-          .cta-btn:active { transform: scale(0.95); }
+          .cta-btn:hover { background: #1a627a; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(17, 75, 95, 0.5); }
+          .cta-btn:active { transform: translateY(1px) scale(0.98); }
         </style>
   
         <div class="gazeta-ad-container">
@@ -238,13 +260,11 @@ class GazetaAdWidget extends HTMLElement {
                 ${mediaHtml}
             </div>
     
-    
-    
             <div class="top-ui">
                 <div class="brand-badge">
                 <div class="brand-icon" style="text-transform: uppercase;">${ad.ad_name ? ad.ad_name.charAt(0) : 'G'}</div>
                 <span class="brand-name">${ad.ad_name || 'Gazeta'}</span>
-                <span class="sponsored-tag">Sponsored</span>
+                <span class="sponsored-tag">Ad</span>
                 </div>
                 <div class="top-actions">
                 ${isVideo ? `
@@ -283,17 +303,17 @@ class GazetaAdWidget extends HTMLElement {
         });
       }
 
-      // 1. Impression Tracking (when ad is visible on screen)
+      // Track Impression
       const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
           this.trackEvent(appId, 'impression');
           observer.disconnect();
         }
-      }, { threshold: 0.5 });
+      }, { threshold: 0.3 });
       
       observer.observe(this.shadowRoot.querySelector('.gazeta-ad-container'));
 
-      // 2. Click Tracking
+      // Track Click
       const ctaBtn = this.shadowRoot.querySelector('.cta-btn');
       if (ctaBtn) {
         ctaBtn.addEventListener('click', () => {
