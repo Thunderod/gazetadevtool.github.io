@@ -25,6 +25,7 @@ window.Gazeta = window.Gazeta || {
               app_id: this._config.appId,
               target_age: this._config.targetAge || 'all',
               app_category: this._config.appCategory || 'all',
+              format: this._config.format || 'normal',
               limit: 5 // Fetch a pool of 5 ads
           })
         });
@@ -88,6 +89,11 @@ window.Gazeta = window.Gazeta || {
         const appId = this.getAttribute('app-id');
         const targetAge = this.getAttribute('target-age') || 'all';
         const appCategory = this.getAttribute('app-category') || 'all';
+        const format = this.getAttribute('format') || 'normal';
+        let skipAfter = parseInt(this.getAttribute('skip-after') || '5', 10);
+        
+        // Strictly force 30s for rewarded ads
+        if (format === 'rewarded') skipAfter = 30;
         
         const rootStyles = `
           :host {
@@ -178,11 +184,11 @@ window.Gazeta = window.Gazeta || {
     
         try {
           // Ask the global pool for the next ad (0ms if pre-fetched!)
-          const ad = await window.Gazeta.getNextAd({ appId, targetAge, appCategory });
+          const ad = await window.Gazeta.getNextAd({ appId, targetAge, appCategory, format });
     
           if (!ad) throw new Error("No active ads found that match criteria.");
     
-          this.renderAd(ad, appId, rootStyles);
+          this.renderAd(ad, appId, rootStyles, format, skipAfter);
         } catch (e) {
           this.shadowRoot.innerHTML = `
             <style>${rootStyles}</style>
@@ -213,10 +219,9 @@ window.Gazeta = window.Gazeta || {
         }
       }
     
-      renderAd(ad, appId, rootStyles) {
+      renderAd(ad, appId, rootStyles, format, skipAfter) {
         const mutedIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
         const volumeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
-        const closeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
         const infoIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
     
         const isVideo = ad.file_type === 'video';
@@ -327,7 +332,7 @@ window.Gazeta = window.Gazeta || {
               letter-spacing: 0.5px; 
             }
             
-            .top-actions { display: flex; gap: calc(var(--gzt-spacing) * 0.5); }
+            .top-actions { display: flex; gap: calc(var(--gzt-spacing) * 0.5); align-items: center; }
             .circle-btn {
               width: var(--gzt-circle-btn);
               height: var(--gzt-circle-btn);
@@ -346,6 +351,22 @@ window.Gazeta = window.Gazeta || {
             .circle-btn:hover { background: rgba(0,0,0,0.6); transform: scale(1.05); }
             .circle-btn:active { transform: scale(0.95); }
             .circle-btn svg { width: 50%; height: 50%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+
+            .countdown-badge {
+              background: rgba(0,0,0,0.6);
+              backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px);
+              color: white;
+              font-weight: 700;
+              font-size: var(--gzt-brand);
+              padding: calc(var(--gzt-spacing) * 0.4) calc(var(--gzt-spacing) * 0.8);
+              border-radius: 9999px;
+              border: 1px solid rgba(255,255,255,0.1);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              white-space: nowrap;
+            }
     
             /* Bottom Pinned Bar */
             .bottom-bar {
@@ -411,7 +432,12 @@ window.Gazeta = window.Gazeta || {
                       </div>
                       <div class="top-actions">
                           ${isVideo ? `<button class="circle-btn" id="muteBtn">${mutedIcon}</button>` : ''}
-                          <slot name="close-button"></slot>
+                          <div class="countdown-badge" id="countdownBadge">
+                             ${format === 'rewarded' ? `Reward in ${skipAfter}s` : `Skip in ${skipAfter}s`}
+                          </div>
+                          <div id="closeSlotWrapper" style="display: none; pointer-events: none;">
+                             <slot name="close-button"></slot>
+                          </div>
                       </div>
                   </div>
           
@@ -429,6 +455,25 @@ window.Gazeta = window.Gazeta || {
         `;
     
         const wrapper = this.shadowRoot.querySelector('.gazeta-wrapper');
+        const badge = this.shadowRoot.getElementById('countdownBadge');
+        const closeWrapper = this.shadowRoot.getElementById('closeSlotWrapper');
+        
+        let remainingTime = skipAfter;
+        const timerInterval = setInterval(() => {
+           remainingTime--;
+           if (remainingTime > 0) {
+              badge.innerText = format === 'rewarded' ? `Reward in ${remainingTime}s` : `Skip in ${remainingTime}s`;
+           } else {
+              clearInterval(timerInterval);
+              badge.style.display = 'none';
+              closeWrapper.style.display = 'block';
+              closeWrapper.style.pointerEvents = 'auto';
+              
+              if (format === 'rewarded') {
+                 this.trackEvent(appId, 'reward_granted');
+              }
+           }
+        }, 1000);
         
         if (isVideo) {
           const fgMedia = this.shadowRoot.getElementById('adMedia');
