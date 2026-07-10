@@ -18,7 +18,11 @@ export function IntegrationDocs() {
   app-id="YOUR_APP_ID"
   target-age="18-35" 
   app-category="finance"
-></gazeta-ad>`;
+>
+  <button slot="close-button" onclick="this.parentElement.remove()">
+    Close
+  </button>
+</gazeta-ad>`;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -141,6 +145,16 @@ export function IntegrationDocs() {
                   Allows you to restrict the types of ads shown on your site. For example, pass <code className="text-zinc-700 dark:text-zinc-300 font-mono">game</code> if your site is a gaming portal to receive gaming-related ads, which generally convert better.
                 </p>
               </div>
+
+              <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
+                <div className="flex items-start justify-between mb-2">
+                  <code className="text-[13px] font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20 px-2 py-1 rounded border border-brand-100 dark:border-brand-800/50">slot="close-button"</code>
+                  <span className="text-[11px] font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest bg-brand-50 dark:bg-brand-900/20 px-2 py-0.5 rounded border border-brand-100 dark:border-brand-800/50">Customization</span>
+                </div>
+                <p className="text-[13px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                  The SDK leaves a dedicated space for you to inject your own custom close button. Just nest any HTML element with <code className="text-zinc-700 dark:text-zinc-300 font-mono">slot="close-button"</code> inside the tag, and it will be perfectly positioned at the top right.
+                </p>
+              </div>
             </div>
 
             <div className="bg-zinc-950 rounded-3xl p-6 border border-zinc-800 shadow-inner flex flex-col">
@@ -153,7 +167,11 @@ export function IntegrationDocs() {
                 <span className="text-emerald-300">  app-id=</span><span className="text-amber-300">"YOUR_APP_ID"</span>{'\n'}
                 <span className="text-emerald-300">  target-age=</span><span className="text-amber-300">"18-35"</span>{'\n'}
                 <span className="text-emerald-300">  app-category=</span><span className="text-amber-300">"finance"</span>{'\n'}
-                <span className="text-brand-400">&gt;&lt;/gazeta-ad&gt;</span>
+                <span className="text-brand-400">&gt;</span>{'\n'}
+                <span className="text-zinc-300">  </span><span className="text-brand-400">&lt;button</span><span className="text-emerald-300"> slot=</span><span className="text-amber-300">"close-button"</span><span className="text-emerald-300"> onclick=</span><span className="text-amber-300">"this.parentElement.remove()"</span><span className="text-brand-400">&gt;</span>{'\n'}
+                <span className="text-zinc-300">    Close</span>{'\n'}
+                <span className="text-zinc-300">  </span><span className="text-brand-400">&lt;/button&gt;</span>{'\n'}
+                <span className="text-brand-400">&lt;/gazeta-ad&gt;</span>
               </pre>
               <div className="mt-4 pt-4 border-t border-zinc-800/50">
                 <button 

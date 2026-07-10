@@ -411,7 +411,7 @@ window.Gazeta = window.Gazeta || {
                       </div>
                       <div class="top-actions">
                           ${isVideo ? `<button class="circle-btn" id="muteBtn">${mutedIcon}</button>` : ''}
-                          <button class="circle-btn" onclick="this.getRootNode().host.remove()">${closeIcon}</button>
+                          <slot name="close-button"></slot>
                       </div>
                   </div>
           
