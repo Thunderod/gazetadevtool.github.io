@@ -32,7 +32,7 @@ export function Dashboard() {
     async function loadData() {
       if (!user) return;
       try {
-        const { data: appsData } = await supabase.from('apps').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+        const { data: appsData } = await supabase.from('apps').select('*').eq('developer_id', user.id).order('created_at', { ascending: false });
         if (appsData) setApps(appsData);
 
         if (appsData && appsData.length > 0) {

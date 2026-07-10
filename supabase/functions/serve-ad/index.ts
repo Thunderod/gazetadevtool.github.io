@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { app_id, ad_id, target_age, app_category, format = 'normal', limit = 5, event_type = 'request' } = await req.json()
+    const { app_id, ad_id, target_age, app_category, limit = 5, event_type = 'request' } = await req.json()
     if (!app_id) {
       return new Response(JSON.stringify({ error: 'Missing app_id' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 })
     }
@@ -79,7 +79,6 @@ serve(async (req) => {
       body: JSON.stringify({
         p_target_age: target_age,
         p_app_category: app_category,
-        p_format: format,
         p_limit: limit
       })
     })
