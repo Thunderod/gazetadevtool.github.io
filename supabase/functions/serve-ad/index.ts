@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { app_id, target_age, app_category, limit = 5, event_type = 'request' } = await req.json()
+    const { app_id, ad_id, target_age, app_category, limit = 5, event_type = 'request' } = await req.json()
     if (!app_id) {
       return new Response(JSON.stringify({ error: 'Missing app_id' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 })
     }
@@ -40,12 +40,6 @@ serve(async (req) => {
       p_stat_type: event_type
     })
 
-    // If it's just an impression or click, return success without fetching an ad
-    if (event_type === 'impression' || event_type === 'click') {
-      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 })
-    }
-
-    // Otherwise, fetch from Project A (Ad Network Backend)
     let projectAUrl = Deno.env.get('PROJECT_A_SUPABASE_URL')
     const projectAKey = Deno.env.get('PROJECT_A_ANON_KEY')
 
@@ -56,6 +50,24 @@ serve(async (req) => {
     if (!projectAUrl || !projectAKey) {
         return new Response(JSON.stringify({ error: 'Gateway configuration error' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 })
     }
+
+    // If it's just an impression or click, forward to Project A and return success
+    if (event_type === 'impression' || event_type === 'click') {
+      if (ad_id) {
+        await fetch(`${projectAUrl}/rest/v1/rpc/${event_type === 'impression' ? 'track_ad_impression' : 'track_ad_click'}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": projectAKey,
+            "Authorization": `Bearer ${projectAKey}`
+          },
+          body: JSON.stringify({ p_ad_id: ad_id })
+        })
+      }
+      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 })
+    }
+
+    // Otherwise, fetch from Project A (Ad Network Backend) for a request
 
     const response = await fetch(`${projectAUrl}/rest/v1/rpc/get_active_ads_pool`, {
       method: "POST",
