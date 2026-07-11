@@ -1,3 +1,31 @@
+if (!window.Gazeta) {
+  window.Gazeta = {
+    pool: [],
+    init: async function(appId, targetAge = 'all', appCategory = 'all') {
+      try {
+        const response = await fetch("https://hvoubbgzntldqoxqyoij.supabase.co/functions/v1/serve-ad", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ app_id: appId, target_age: targetAge, app_category: appCategory })
+        });
+        const ads = await response.json();
+        if (response.ok && ads && ads.length > 0) {
+          ads.forEach(ad => {
+             this.pool.push(ad);
+             const link = document.createElement('link');
+             link.rel = 'preload';
+             link.href = ad.media_url;
+             link.as = ad.file_type === 'video' ? 'video' : 'image';
+             document.head.appendChild(link);
+          });
+        }
+      } catch (e) {
+        console.error("Gazeta init error:", e);
+      }
+    }
+  };
+}
+
 class GazetaAdWidget extends HTMLElement {
   constructor() {
     super();
@@ -8,6 +36,7 @@ class GazetaAdWidget extends HTMLElement {
     const appId = this.getAttribute('app-id');
     const targetAge = this.getAttribute('target-age') || 'all';
     const appCategory = this.getAttribute('app-category') || 'all';
+    const format = this.getAttribute('format') || 'normal';
 
     const rootStyles = `
         :host {
@@ -39,12 +68,9 @@ class GazetaAdWidget extends HTMLElement {
           font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           width: 100%;
           height: 100%;
-          min-height: 250px;
-          max-height: 85vh; /* Prevent taking entire screen on extremely tall devices */
-          aspect-ratio: 4 / 5; /* Initial fallback, overridden by media intrinsic ratio */
           border-radius: var(--gzt-radius);
           overflow: hidden;
-          background: #0f172a;
+          background: #000;
           position: relative;
           box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
           display: flex;
@@ -93,6 +119,17 @@ class GazetaAdWidget extends HTMLElement {
         <div class="gazeta-wrapper loading"></div>
       `;
 
+    // Zero-Latency Pre-fetching Check
+    let preloadedAd = null;
+    if (window.Gazeta && window.Gazeta.pool && window.Gazeta.pool.length > 0) {
+      preloadedAd = window.Gazeta.pool.shift(); // take from front
+    }
+
+    if (preloadedAd) {
+      this.renderAd(preloadedAd, appId, format, rootStyles);
+      return;
+    }
+
     try {
       const response = await fetch("https://hvoubbgzntldqoxqyoij.supabase.co/functions/v1/serve-ad", {
         method: "POST",
@@ -100,7 +137,8 @@ class GazetaAdWidget extends HTMLElement {
         body: JSON.stringify({
           app_id: appId,
           target_age: targetAge,
-          app_category: appCategory
+          app_category: appCategory,
+          format: format
         })
       });
 
@@ -112,7 +150,7 @@ class GazetaAdWidget extends HTMLElement {
       if (!jsonArray || jsonArray.length === 0) throw new Error("No active ads found that match criteria.");
       const ad = jsonArray[0];
 
-      this.renderAd(ad, appId, rootStyles);
+      this.renderAd(ad, appId, format, rootStyles);
     } catch (e) {
       this.shadowRoot.innerHTML = `
           <style>${rootStyles}</style>
@@ -141,7 +179,7 @@ class GazetaAdWidget extends HTMLElement {
     }
   }
 
-  renderAd(ad, appId, rootStyles) {
+  renderAd(ad, appId, format, rootStyles) {
     // Scalable SVG Icons
     const playIcon = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
     const pauseIcon = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
@@ -276,6 +314,27 @@ class GazetaAdWidget extends HTMLElement {
           .circle-btn:hover { background: rgba(0,0,0,0.8); transform: scale(1.05); }
           .circle-btn:active { transform: scale(0.95); }
           .circle-btn svg { width: 50%; height: 50%; }
+          
+          .countdown-badge {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: white;
+            font-size: calc(var(--gzt-brand) * 1.1);
+            font-weight: 700;
+            padding: calc(var(--gzt-spacing) * 0.4) calc(var(--gzt-spacing) * 0.8);
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+            pointer-events: auto;
+          }
+          
+          .close-slot-wrapper {
+            display: none;
+            pointer-events: auto;
+          }
   
           .spacer { flex: 1; }
   
@@ -330,73 +389,6 @@ class GazetaAdWidget extends HTMLElement {
           .cta-btn:active { transform: translate3d(0, 1px, 0) scale(0.98); }
           .cta-btn svg { width: calc(var(--gzt-btn-text) * 1.2); height: calc(var(--gzt-btn-text) * 1.2); }
 
-          /* =======================================================
-             CONTAINER QUERIES - INTELLIGENT ADAPTIVE LAYOUTS
-             ======================================================= */
-          
-          /* Horizontal / Landscape Layout (Tablets, Desktop Embedded) */
-          @container gazeta-ad (min-width: 500px) {
-            .gazeta-wrapper {
-              flex-direction: row;
-              aspect-ratio: auto;
-              height: auto;
-              min-height: 200px;
-            }
-            .media-container {
-              position: relative;
-              flex: 1 1 50%;
-              height: 100%;
-            }
-            .media-fg {
-              /* In horizontal layout, cover the left half smoothly */
-              object-fit: cover;
-            }
-            .ui-layer {
-              flex: 1 1 50%;
-              background: #0f172a; /* Solid background for text half */
-              height: 100%;
-            }
-            .top-bar {
-              position: absolute;
-              top: 0; left: 0; right: 0;
-              width: 100%;
-              z-index: 20;
-            }
-            .spacer { display: none; }
-            .bottom-bar {
-              background: none;
-              padding: var(--gzt-safe-top) var(--gzt-safe-right) var(--gzt-safe-bottom) var(--gzt-spacing);
-              height: 100%;
-              justify-content: center;
-            }
-            .ad-desc { -webkit-line-clamp: 4; }
-          }
-
-          /* Micro-Banner Layout (e.g. 320x50 or 728x90 sticky footer) */
-          @container gazeta-ad (max-height: 150px) {
-            .gazeta-wrapper {
-              flex-direction: row;
-              border-radius: 0; /* Banners usually bleed to edges */
-            }
-            .media-container {
-              position: relative;
-              flex: 0 0 100px;
-            }
-            .media-fg { object-fit: cover; }
-            .top-bar { display: none; }
-            .spacer { display: none; }
-            .bottom-bar {
-              background: #0f172a;
-              flex: 1;
-              flex-direction: row;
-              align-items: center;
-              justify-content: space-between;
-              padding: var(--gzt-spacing);
-            }
-            .ad-title { margin: 0; -webkit-line-clamp: 1; font-size: calc(var(--gzt-title) * 0.8); }
-            .ad-desc { display: none; }
-            .cta-btn { width: auto; padding: calc(var(--gzt-spacing)*0.5) var(--gzt-spacing); }
-          }
         </style>
   
         <div class="gazeta-wrapper">
@@ -413,7 +405,10 @@ class GazetaAdWidget extends HTMLElement {
                     </div>
                     <div class="top-actions">
                         ${isVideo ? `<button class="circle-btn" id="muteBtn">${mutedIcon}</button>` : ''}
-                        <button class="circle-btn" onclick="this.getRootNode().host.remove()">${closeIcon}</button>
+                        <div class="countdown-badge" id="countdownBadge"></div>
+                        <div class="close-slot-wrapper" id="closeSlotWrapper">
+                            <slot name="close-button"><button class="circle-btn" onclick="this.getRootNode().host.remove()">${closeIcon}</button></slot>
+                        </div>
                     </div>
                 </div>
         
@@ -435,20 +430,7 @@ class GazetaAdWidget extends HTMLElement {
     const wrapper = this.shadowRoot.querySelector('.gazeta-wrapper');
     const fgMedia = this.shadowRoot.getElementById('adMedia');
 
-    // Dynamically detect intrinsic aspect ratio to perfectly fit vertical/square videos
-    const updateAspectRatio = (width, height) => {
-      if (width > 0 && height > 0) {
-        // Setting the container aspect ratio allows it to perfectly wrap the media
-        // if it hasn't been constrained by an @container layout query.
-        wrapper.style.aspectRatio = `${width} / ${height}`;
-      }
-    };
-
     if (isVideo) {
-      fgMedia.addEventListener('loadedmetadata', () => {
-        updateAspectRatio(fgMedia.videoWidth, fgMedia.videoHeight);
-      });
-
       const muteBtn = this.shadowRoot.getElementById('muteBtn');
       let isMuted = true;
       muteBtn.addEventListener('click', () => {
@@ -457,10 +439,6 @@ class GazetaAdWidget extends HTMLElement {
         // Apply to background layer as well, just in case
         this.shadowRoot.querySelectorAll('video').forEach(v => v.muted = isMuted);
         muteBtn.innerHTML = isMuted ? mutedIcon : volumeIcon;
-      });
-    } else {
-      fgMedia.addEventListener('load', () => {
-        updateAspectRatio(fgMedia.naturalWidth, fgMedia.naturalHeight);
       });
     }
 
@@ -478,6 +456,28 @@ class GazetaAdWidget extends HTMLElement {
     if (ctaBtn) {
       ctaBtn.addEventListener('click', () => this.trackEvent(appId, 'click'));
     }
+
+    // Skip Timer System
+    const waitTime = format === 'rewarded' ? 30 : 5;
+    let timeLeft = waitTime;
+    const countdownBadge = this.shadowRoot.getElementById('countdownBadge');
+    const closeSlotWrapper = this.shadowRoot.getElementById('closeSlotWrapper');
+    
+    countdownBadge.innerText = format === 'rewarded' ? \`Reward in \${timeLeft}s\` : \`Skip in \${timeLeft}s\`;
+    
+    const timerInterval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft > 0) {
+        countdownBadge.innerText = format === 'rewarded' ? \`Reward in \${timeLeft}s\` : \`Skip in \${timeLeft}s\`;
+      } else {
+        clearInterval(timerInterval);
+        countdownBadge.style.display = 'none';
+        closeSlotWrapper.style.display = 'block';
+        if (format === 'rewarded') {
+           this.trackEvent(appId, 'reward_granted');
+        }
+      }
+    }, 1000);
   }
 }
 
