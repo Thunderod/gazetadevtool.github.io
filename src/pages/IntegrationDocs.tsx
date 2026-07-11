@@ -12,9 +12,14 @@ export function IntegrationDocs() {
   };
 
   const scriptSnippet = `<script src="${window.location.origin}${import.meta.env.BASE_URL}gazeta-sdk.js"></script>`;
-  const htmlSnippet = `<gazeta-ad app-id="YOUR_APP_ID"></gazeta-ad>`;
+  const htmlSnippet = `<!-- The ad naturally fills its parent container. -->
+<!-- For a TikTok-style full-screen ad, wrap it like this: -->
+<div style="width: 100vw; height: 100vh; position: fixed; inset: 0;">
+  <gazeta-ad app-id="YOUR_APP_ID"></gazeta-ad>
+</div>`;
   
-  const advancedSnippet = `<gazeta-ad 
+  const advancedSnippet = `<!-- Advanced Rewarded Ad Example -->
+<gazeta-ad 
   app-id="YOUR_APP_ID"
   target-age="18-35" 
   app-category="finance"
@@ -93,7 +98,7 @@ export function IntegrationDocs() {
               Mount the Ad Unit
             </h2>
             <p className="text-zinc-500 dark:text-zinc-400 mb-6 text-[15px] leading-relaxed">
-              Place this custom HTML tag exactly where you want the ad to render in your layout. Make sure to replace <code className="text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded text-sm">YOUR_APP_ID</code>. The SDK will automatically handle sizing, rendering, and analytics tracking.
+              Place this custom HTML tag exactly where you want the ad to render. The <code className="font-mono text-sm">&lt;gazeta-ad&gt;</code> is a completely fluid, Edge-to-Edge component. It will automatically consume 100% of the width and height of its parent container. For a TikTok/Reels immersive experience, drop it into a full-screen wrapper.
             </p>
             
             <div className="bg-zinc-950 rounded-2xl p-4 flex items-center justify-between mt-auto border border-zinc-800 shadow-inner">
@@ -121,7 +126,7 @@ export function IntegrationDocs() {
           </div>
           
           <p className="text-zinc-600 dark:text-zinc-400 mb-8 max-w-3xl leading-relaxed">
-            The <code className="font-mono text-sm bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-800 dark:text-zinc-200">&lt;gazeta-ad&gt;</code> element supports several optional HTML attributes that allow you to control the exact demographic targeting of the ad. We use smart layout engines so you don't need to pass width or height properties—the ad will automatically size itself perfectly to fit its parent container and the user's screen.
+            The <code className="font-mono text-sm bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-800 dark:text-zinc-200">&lt;gazeta-ad&gt;</code> element supports several HTML attributes that allow you to control targeting and ad formats. Because it is an edge-to-edge component, you don't need to pass width or height properties—the UI floats securely over the background media and dynamically adapts to the container's safe-areas.
           </p>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -224,13 +229,65 @@ export function IntegrationDocs() {
             </div>
             <pre className="text-[13px] font-mono text-zinc-300 overflow-x-auto whitespace-pre-wrap leading-relaxed">
 <span className="text-brand-400">&lt;script&gt;</span>{'\n'}
-<span className="text-zinc-300">  </span><span className="text-emerald-300">window.Gazeta.init</span><span className="text-zinc-300">({'{'}</span>{'\n'}
-<span className="text-zinc-300">    appId: </span><span className="text-amber-300">'YOUR_APP_ID'</span><span className="text-zinc-300">,</span>{'\n'}
-<span className="text-zinc-300">    targetAge: </span><span className="text-amber-300">'18-35'</span><span className="text-zinc-300">, </span><span className="text-zinc-500">// Optional</span>{'\n'}
-<span className="text-zinc-300">    appCategory: </span><span className="text-amber-300">'finance'</span><span className="text-zinc-300"> </span><span className="text-zinc-500">// Optional</span>{'\n'}
-<span className="text-zinc-300">  {'}'});</span>{'\n'}
+<span className="text-zinc-300">  </span><span className="text-emerald-300">window.Gazeta.init</span><span className="text-zinc-300">(</span><span className="text-amber-300">'YOUR_APP_ID'</span><span className="text-zinc-300">, </span><span className="text-amber-300">'18-35'</span><span className="text-zinc-300">, </span><span className="text-amber-300">'finance'</span><span className="text-zinc-300">);</span>{'\n'}
 <span className="text-brand-400">&lt;/script&gt;</span>
             </pre>
+          </div>
+        </motion.div>
+
+        {/* Immersive Architecture Section */}
+        <motion.div variants={itemVariants} className="bg-gradient-to-br from-zinc-900 to-zinc-950 p-8 rounded-3xl border border-zinc-800 shadow-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2.5 bg-brand-500/20 rounded-xl border border-brand-500/30">
+              <Settings2 className="h-5 w-5 text-brand-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white tracking-tight">Under the Hood: Immersive Architecture</h3>
+          </div>
+          
+          <p className="text-zinc-400 mb-8 max-w-3xl leading-relaxed">
+            Gazeta is engineered to rival premium SDKs like TikTok and Instagram Reels. We completely stripped away legacy pixel sizes and Javascript aspect-ratio calculators in favor of a modern CSS architecture built for immersive, edge-to-edge media.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white/5 border border-white/10 p-5 rounded-2xl">
+              <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                100% Parent Adoption
+              </h4>
+              <p className="text-[13px] text-zinc-400 leading-relaxed">
+                The ad behaves like water. It forces no max-width or aspect-ratio. It perfectly fills 100% of the HTML container you place it inside. If you put it in a fullscreen div, it becomes a fullscreen ad.
+              </p>
+            </div>
+
+            <div className="bg-white/5 border border-white/10 p-5 rounded-2xl">
+              <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                Blurred Background Trick
+              </h4>
+              <p className="text-[13px] text-zinc-400 leading-relaxed">
+                To prevent ugly black bars or aggressive cropping on mismatched videos, we use a dual-layer media system. A heavily blurred, zoomed-in background layer dynamically color-matches the empty space, while the crisp video plays uncropped in the foreground.
+              </p>
+            </div>
+
+            <div className="bg-white/5 border border-white/10 p-5 rounded-2xl">
+              <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                Absolute Floating UI
+              </h4>
+              <p className="text-[13px] text-zinc-400 leading-relaxed">
+                The UI is completely detached from the media using absolute positioning. It is permanently pinned to the edges, utilizing <code className="text-brand-300 bg-brand-500/10 px-1 rounded">env(safe-area-inset)</code> to ensure notches never cover the buttons, keeping the center completely unobstructed.
+              </p>
+            </div>
+
+            <div className="bg-white/5 border border-white/10 p-5 rounded-2xl">
+              <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                Fluid Typography (cqw)
+              </h4>
+              <p className="text-[13px] text-zinc-400 leading-relaxed">
+                Instead of fixed breakpoints, the SDK uses CSS Container Queries. All fonts, paddings, and buttons use mathematical <code className="text-brand-300 bg-brand-500/10 px-1 rounded">clamp()</code> functions tied to the container width, ensuring it scales flawlessly on everything from a tiny iPhone SE to a massive tablet in 0 milliseconds without layout jitter.
+              </p>
+            </div>
           </div>
         </motion.div>
 
