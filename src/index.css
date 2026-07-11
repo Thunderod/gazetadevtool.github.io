@@ -5,16 +5,16 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   
-  --color-brand-50: #f0f6f8;
-  --color-brand-100: #dbeaf0;
-  --color-brand-200: #bbd8e3;
-  --color-brand-300: #8ebcd0;
-  --color-brand-400: #5b99b5;
-  --color-brand-500: #114B5F;
-  --color-brand-600: #103e50;
-  --color-brand-700: #0f3342;
-  --color-brand-800: #0e2936;
-  --color-brand-900: #0b222d;
+  --color-brand-50: #fef5ec;
+  --color-brand-100: #fcebd8;
+  --color-brand-200: #f8d3af;
+  --color-brand-300: #f4ba86;
+  --color-brand-400: #ef974e;
+  --color-brand-500: #d96c06;
+  --color-brand-600: #b85b05;
+  --color-brand-700: #934904;
+  --color-brand-800: #763a03;
+  --color-brand-900: #603003;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));

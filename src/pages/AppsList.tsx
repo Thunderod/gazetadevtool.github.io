@@ -180,7 +180,7 @@ export function AppsList() {
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 rounded-full bg-zinc-900 dark:bg-zinc-100 px-5 py-2.5 text-sm font-semibold text-white dark:text-zinc-900 shadow-lg hover:bg-zinc-800 dark:hover:bg-white transition-colors"
+          className="flex items-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-brand-600 transition-colors"
         >
           <Plus className="h-4 w-4" />
           Add App
@@ -481,7 +481,7 @@ export function AppsList() {
                     <button 
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex items-center gap-2 rounded-xl bg-zinc-900 dark:bg-zinc-100 px-6 py-2.5 text-sm font-semibold text-white dark:text-zinc-900 shadow-md hover:bg-zinc-800 dark:hover:bg-white transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 rounded-xl bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-brand-600 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
                       {isSubmitting ? 'Adding...' : 'Add App'}

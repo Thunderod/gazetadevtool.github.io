@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, Eye, Smartphone, MousePointerClick, Activity, Loader2, ArrowUpRight, Plus, Box } from 'lucide-react';
+import { DollarSign, Eye, Smartphone, MousePointerClick, Activity, Loader2, ArrowUpRight, Plus, Box, CheckCircle2, Zap, BookOpen, ArrowRight, CreditCard, LayoutTemplate } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -32,7 +32,7 @@ export function Dashboard() {
     async function loadData() {
       if (!user) return;
       try {
-        const { data: appsData } = await supabase.from('apps').select('*').eq('developer_id', user.id).order('created_at', { ascending: false });
+        const { data: appsData } = await supabase.from('apps').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
         if (appsData) setApps(appsData);
 
         if (appsData && appsData.length > 0) {
@@ -99,6 +99,89 @@ export function Dashboard() {
             <Activity className="h-4 w-4" />
             Insights
           </button>
+        </div>
+
+        </div>
+
+        {/* ONBOARDING & QUICK ACTIONS (New Roadmap Feature) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Onboarding Progress */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm relative overflow-hidden"
+          >
+            <div className="absolute right-0 top-0 w-64 h-64 bg-brand-500/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+            <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start md:items-center">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">Get Started</span>
+                  <span className="bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400 text-[10px] px-2 py-0.5 rounded-full font-bold">2/3 DONE</span>
+                </div>
+                <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">Complete your setup</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 max-w-md">You're almost ready to start monetizing. Finish integrating the Gazeta SDK into your application to go live.</p>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 opacity-50">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                    <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 line-through">Create publisher account</span>
+                  </div>
+                  <div className="flex items-center gap-3 opacity-50">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                    <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 line-through">Register first application</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-xl border border-zinc-200 dark:border-zinc-700/50">
+                    <div className="w-5 h-5 rounded-full border-2 border-brand-500 flex items-center justify-center">
+                      <div className="w-2 h-2 rounded-full bg-brand-500"></div>
+                    </div>
+                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Integrate Gazeta SDK</span>
+                    <a href="/docs" className="ml-auto text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline">View Docs &rarr;</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Quick Actions */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex flex-col gap-4"
+          >
+            <a href="/apps" className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl flex items-center gap-4 hover:border-brand-500/50 hover:shadow-md transition-all">
+              <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 group-hover:text-brand-500 group-hover:bg-brand-50 transition-colors">
+                <Plus className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Add New App</h4>
+                <p className="text-xs text-zinc-500">Register another platform</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-zinc-300 dark:text-zinc-700 group-hover:text-brand-500 transition-colors -translate-x-2 group-hover:translate-x-0 opacity-0 group-hover:opacity-100" />
+            </a>
+            
+            <a href="/docs" className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl flex items-center gap-4 hover:border-brand-500/50 hover:shadow-md transition-all">
+              <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 group-hover:text-brand-500 group-hover:bg-brand-50 transition-colors">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">SDK Docs</h4>
+                <p className="text-xs text-zinc-500">View integration guides</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-zinc-300 dark:text-zinc-700 group-hover:text-brand-500 transition-colors -translate-x-2 group-hover:translate-x-0 opacity-0 group-hover:opacity-100" />
+            </a>
+            
+            <a href="/payouts" className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl flex items-center gap-4 hover:border-brand-500/50 hover:shadow-md transition-all">
+              <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 group-hover:text-brand-500 group-hover:bg-brand-50 transition-colors">
+                <CreditCard className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Payouts</h4>
+                <p className="text-xs text-zinc-500">Configure bank details</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-zinc-300 dark:text-zinc-700 group-hover:text-brand-500 transition-colors -translate-x-2 group-hover:translate-x-0 opacity-0 group-hover:opacity-100" />
+            </a>
+          </motion.div>
         </div>
 
         {/* HERO KPI CARD */}
@@ -216,7 +299,7 @@ export function Dashboard() {
                 </div>
                 <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1">No applications found</h3>
                 <p className="text-xs text-zinc-500 max-w-[250px] mb-6 leading-relaxed">Get started by creating your first app to begin tracking revenue and impressions.</p>
-                <button className="flex items-center gap-2 px-4 py-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-sm font-medium hover:bg-zinc-800 dark:hover:bg-white transition-colors">
+                <button className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white rounded-lg text-sm font-medium hover:bg-brand-600 transition-colors">
                   <Plus className="h-4 w-4" />
                   Create App
                 </button>
