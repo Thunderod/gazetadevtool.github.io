@@ -37,12 +37,16 @@ class GazetaAdWidget extends HTMLElement {
     const targetAge = this.getAttribute('target-age') || 'all';
     const appCategory = this.getAttribute('app-category') || 'all';
     const format = this.getAttribute('format') || 'normal';
+    let hostAspect = 'auto';
+    if (format === 'square') hostAspect = '1 / 1';
+    else if (format === 'vertical') hostAspect = '1 / 3.75';
 
     const rootStyles = `
         :host {
           display: block;
           width: 100%;
-          height: 100%;
+          height: ${hostAspect === 'auto' ? '100%' : 'auto'};
+          aspect-ratio: ${hostAspect !== 'auto' ? hostAspect : 'auto'};
           container-type: inline-size;
           container-name: gazeta-ad;
           
