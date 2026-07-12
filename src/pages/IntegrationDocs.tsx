@@ -18,7 +18,7 @@ export function IntegrationDocs() {
   <gazeta-ad app-id="YOUR_APP_ID"></gazeta-ad>
 </div>`;
   
-  const advancedSnippet = `<!-- Advanced Video Ad Example -->
+const advancedSnippet = `<!-- Advanced Video Ad Example -->
 <gazeta-ad 
   app-id="YOUR_APP_ID"
   target-age="18-35" 
@@ -29,6 +29,14 @@ export function IntegrationDocs() {
     Close Ad
   </button>
 </gazeta-ad>`;
+
+  const bannerSnippet = `<!-- Native Banner Ad Example -->
+<gazeta-ad 
+  app-id="YOUR_APP_ID" 
+  format="horizontal" 
+  width="100%" 
+  height="90px"
+></gazeta-ad>`;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -116,6 +124,30 @@ export function IntegrationDocs() {
           </motion.div>
         </div>
 
+        {/* Basic Banner Section */}
+        <motion.div variants={itemVariants} className="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm mt-6">
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-3 flex items-center gap-3">
+            <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 text-sm font-bold border border-violet-200/50 dark:border-violet-800/50 shadow-sm">3</span>
+            Placing a Banner Ad
+          </h2>
+          <p className="text-zinc-500 dark:text-zinc-400 mb-6 text-[15px] leading-relaxed">
+            If you'd prefer a traditional, static banner instead of an immersive video, you can explicitly request a banner format. Banners will scale exactly to the <code className="font-mono text-sm">width</code> and <code className="font-mono text-sm">height</code> properties you pass, and will naturally display a subtle "Ad" badge without any video controls.
+          </p>
+          
+          <div className="bg-zinc-950 rounded-2xl p-4 flex items-center justify-between mt-auto border border-zinc-800 shadow-inner">
+            <code className="text-[13px] font-mono text-violet-400 break-all leading-tight">
+              {bannerSnippet}
+            </code>
+            <button 
+              onClick={() => handleCopy(bannerSnippet, 'banner')}
+              className="text-zinc-400 hover:text-white transition-colors ml-4 shrink-0 bg-zinc-800/50 hover:bg-zinc-700 p-2.5 rounded-xl border border-zinc-700"
+              title="Copy to clipboard"
+            >
+              {copiedSnippet === 'banner' ? <CheckCircle className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+            </button>
+          </div>
+        </motion.div>
+
         {/* Customization Section */}
         <motion.div variants={itemVariants} className="bg-zinc-50 dark:bg-zinc-900/50 p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-3 mb-6">
@@ -156,12 +188,14 @@ export function IntegrationDocs() {
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex flex-col gap-1">
                     <code className="text-[13px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded border border-violet-100 dark:border-violet-800/50 w-fit">format="video"</code>
-                    <code className="text-[13px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded border border-violet-100 dark:border-violet-800/50 w-fit">format="banner"</code>
+                    <code className="text-[13px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded border border-violet-100 dark:border-violet-800/50 w-fit">format="horizontal"</code>
+                    <code className="text-[13px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded border border-violet-100 dark:border-violet-800/50 w-fit">format="vertical"</code>
+                    <code className="text-[13px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded border border-violet-100 dark:border-violet-800/50 w-fit">format="square"</code>
                   </div>
                   <span className="text-[11px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-widest bg-violet-50 dark:bg-violet-900/20 px-2 py-0.5 rounded border border-violet-100 dark:border-violet-800/50">Format & Type</span>
                 </div>
-                <p className="text-[13px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                  Pass <code className="text-zinc-700 dark:text-zinc-300 font-mono">format="video"</code> to fetch high-engagement video ads. Or pass <code className="text-zinc-700 dark:text-zinc-300 font-mono">format="banner"</code> to fetch static image ads. The ad type (whether it is rewarded or standard) is configured directly inside your app properties in the Dev Console, allowing you to change logic without touching your code.
+                <p className="text-[13px] text-zinc-500 dark:text-zinc-400 leading-relaxed mt-2">
+                  Pass <code className="text-zinc-700 dark:text-zinc-300 font-mono">format="video"</code> to fetch high-engagement immersive video ads. To fetch clean, static banner ads that fit your specified dimensions natively, pass <code className="text-zinc-700 dark:text-zinc-300 font-mono">horizontal</code>, <code className="text-zinc-700 dark:text-zinc-300 font-mono">vertical</code>, or <code className="text-zinc-700 dark:text-zinc-300 font-mono">square</code>. Banners seamlessly drop into your layout without any video UI overlays.
                 </p>
               </div>
 
