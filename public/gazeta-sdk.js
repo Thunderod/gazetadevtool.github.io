@@ -231,54 +231,68 @@ class GazetaAdWidget extends HTMLElement {
             .overlay {
                 position: absolute;
                 inset: 0;
-                background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent);
+                background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.8) 100%);
                 display: flex;
                 flex-direction: column;
-                align-items: center;
                 justify-content: space-between;
-                padding: 16px 4px;
-                gap: 8px;
+                padding: 16px 8px;
             }
+            .top-section { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+            .bottom-section { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
             .brand-icon {
-                width: 32px;
-                height: 32px;
-                flex-shrink: 0;
-                border-radius: 4px;
+                width: 36px;
+                height: 36px;
+                border-radius: 6px;
                 background: #0ea5e9;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 color: white;
-                font-size: 12px;
+                font-size: 14px;
                 font-weight: bold;
                 text-transform: uppercase;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             }
-            .text-container { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 4px; }
-            .title { color: white; font-size: 11px; font-weight: bold; white-space: normal; word-wrap: break-word; width: 100%; }
+            .title { color: white; font-size: 12px; font-weight: bold; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
+            .description { 
+                color: rgba(255,255,255,0.9); 
+                font-size: 10px; 
+                text-align: center; 
+                display: -webkit-box; 
+                -webkit-line-clamp: 3; 
+                -webkit-box-orient: vertical; 
+                overflow: hidden; 
+                text-shadow: 0 1px 2px rgba(0,0,0,0.8); 
+                line-height: 1.3;
+            }
             .cta-btn {
                 width: 100%;
                 background: #0ea5e9;
                 color: white;
-                font-size: 9px;
+                font-size: 11px;
                 font-weight: bold;
-                padding: 6px 0;
-                border-radius: 2px;
+                padding: 8px 0;
+                border-radius: 4px;
                 border: none;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             }
             `;
             bannerHtml = `
             <div class="gazeta-wrapper" id="adContainer">
                 <img id="adMedia" src="${ad.media_url}" alt="${titleText}" />
                 <div class="overlay">
-                    <div class="brand-icon">${brandChar}</div>
-                    <div class="text-container">
+                    <div class="top-section">
+                        <div class="brand-icon">${brandChar}</div>
                         <div class="title">${titleText}</div>
                     </div>
-                    <button class="cta-btn cta-target" id="ctaBtn">${actionText}</button>
+                    <div class="bottom-section">
+                        <div class="description">${descText}</div>
+                        <button class="cta-btn cta-target" id="ctaBtn">${actionText}</button>
+                    </div>
                 </div>
             </div>
             `;
