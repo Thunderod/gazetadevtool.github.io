@@ -280,7 +280,7 @@ class GazetaAdWidget extends HTMLElement {
             `;
         } else if (bannerStyle === 'square') {
             bannerCss = `
-            :host { display: block; width: 100%; height: 100%; }
+            :host { display: block; width: 100%; aspect-ratio: 1 / 1; }
             * { box-sizing: border-box; }
             .gazeta-wrapper {
                 width: 100%;
@@ -376,7 +376,7 @@ class GazetaAdWidget extends HTMLElement {
             `;
         } else {
             bannerCss = `
-            :host { display: block; width: 100%; height: 100%; }
+            :host { display: block; width: 100%; aspect-ratio: 4 / 5; }
             * { box-sizing: border-box; }
             .gazeta-wrapper {
                 width: 100%;
