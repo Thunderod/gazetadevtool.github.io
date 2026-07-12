@@ -213,7 +213,7 @@ class GazetaAdWidget extends HTMLElement {
             .gazeta-wrapper {
                 width: 100%;
                 height: 100%;
-                aspect-ratio: 4 / 5;
+                aspect-ratio: 1 / 3.75;
                 max-width: 100%;
                 position: relative;
                 overflow: hidden;
@@ -376,7 +376,7 @@ class GazetaAdWidget extends HTMLElement {
             `;
         } else {
             bannerCss = `
-            :host { display: block; width: 100%; aspect-ratio: 4 / 5; }
+            :host { display: block; width: 100%; aspect-ratio: 1 / 3.75; }
             * { box-sizing: border-box; }
             .gazeta-wrapper {
                 width: 100%;
