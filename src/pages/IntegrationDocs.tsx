@@ -13,7 +13,7 @@ export function IntegrationDocs() {
 
   const scriptSnippet = `<script src="${window.location.origin}${import.meta.env.BASE_URL}gazeta-sdk.js"></script>`;
   const htmlSnippet = `<!-- The ad naturally fills its parent container. -->
-<!-- For a TikTok-style full-screen ad, wrap it like this: -->
+<!-- For a full-screen immersive experience, wrap it like this: -->
 <div style="width: 100vw; height: 100vh; position: fixed; inset: 0;">
   <gazeta-ad app-id="YOUR_APP_ID"></gazeta-ad>
 </div>`;
@@ -98,7 +98,7 @@ export function IntegrationDocs() {
               Mount the Ad Unit
             </h2>
             <p className="text-zinc-500 dark:text-zinc-400 mb-6 text-[15px] leading-relaxed">
-              Place this custom HTML tag exactly where you want the ad to render. The <code className="font-mono text-sm">&lt;gazeta-ad&gt;</code> is a completely fluid, Edge-to-Edge component. It will automatically consume 100% of the width and height of its parent container. For a TikTok/Reels immersive experience, drop it into a full-screen wrapper.
+              Place this custom HTML tag exactly where you want the ad to render. The <code className="font-mono text-sm">&lt;gazeta-ad&gt;</code> is a completely fluid, Edge-to-Edge component. It will automatically consume 100% of the width and height of its parent container. For a full-screen immersive experience, drop it into a full-screen wrapper.
             </p>
             
             <div className="bg-zinc-950 rounded-2xl p-4 flex items-center justify-between mt-auto border border-zinc-800 shadow-inner">
@@ -245,7 +245,7 @@ export function IntegrationDocs() {
           </div>
           
           <p className="text-zinc-400 mb-8 max-w-3xl leading-relaxed">
-            Gazeta is engineered to rival premium SDKs like TikTok and Instagram Reels. We completely stripped away legacy pixel sizes and Javascript aspect-ratio calculators in favor of a modern CSS architecture built for immersive, edge-to-edge media.
+            Gazeta is engineered to provide a premium, modern ad experience. We completely stripped away legacy pixel sizes and Javascript aspect-ratio calculators in favor of a modern CSS architecture built for immersive, edge-to-edge media.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
