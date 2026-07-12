@@ -464,12 +464,12 @@ class GazetaAdWidget extends HTMLElement {
     const countdownBadge = this.shadowRoot.getElementById('countdownBadge');
     const closeSlotWrapper = this.shadowRoot.getElementById('closeSlotWrapper');
     
-    countdownBadge.innerText = format === 'rewarded' ? \`Reward in \${timeLeft}s\` : \`Skip in \${timeLeft}s\`;
+    countdownBadge.innerText = format === 'rewarded' ? `Reward in ${timeLeft}s` : `Skip in ${timeLeft}s`;
     
     const timerInterval = setInterval(() => {
       timeLeft--;
       if (timeLeft > 0) {
-        countdownBadge.innerText = format === 'rewarded' ? \`Reward in \${timeLeft}s\` : \`Skip in \${timeLeft}s\`;
+        countdownBadge.innerText = format === 'rewarded' ? `Reward in ${timeLeft}s` : `Skip in ${timeLeft}s`;
       } else {
         clearInterval(timerInterval);
         countdownBadge.style.display = 'none';
