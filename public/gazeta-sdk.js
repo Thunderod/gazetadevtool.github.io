@@ -459,26 +459,32 @@ class GazetaAdWidget extends HTMLElement {
     }
 
     // Skip Timer System
-    const waitTime = format === 'rewarded' ? 30 : 5;
-    let timeLeft = waitTime;
     const countdownBadge = this.shadowRoot.getElementById('countdownBadge');
     const closeSlotWrapper = this.shadowRoot.getElementById('closeSlotWrapper');
-    
-    countdownBadge.innerText = format === 'rewarded' ? `Reward in ${timeLeft}s` : `Skip in ${timeLeft}s`;
-    
-    const timerInterval = setInterval(() => {
-      timeLeft--;
-      if (timeLeft > 0) {
-        countdownBadge.innerText = format === 'rewarded' ? `Reward in ${timeLeft}s` : `Skip in ${timeLeft}s`;
-      } else {
-        clearInterval(timerInterval);
-        countdownBadge.style.display = 'none';
-        closeSlotWrapper.style.display = 'block';
-        if (format === 'rewarded') {
-           this.trackEvent(appId, 'reward_granted');
+
+    if (format === 'banner') {
+      countdownBadge.style.display = 'none';
+      closeSlotWrapper.style.display = 'block';
+    } else {
+      const waitTime = format === 'rewarded' ? 30 : 5;
+      let timeLeft = waitTime;
+      
+      countdownBadge.innerText = format === 'rewarded' ? `Reward in ${timeLeft}s` : `Skip in ${timeLeft}s`;
+      
+      const timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          countdownBadge.innerText = format === 'rewarded' ? `Reward in ${timeLeft}s` : `Skip in ${timeLeft}s`;
+        } else {
+          clearInterval(timerInterval);
+          countdownBadge.style.display = 'none';
+          closeSlotWrapper.style.display = 'block';
+          if (format === 'rewarded') {
+             this.trackEvent(appId, 'reward_granted');
+          }
         }
-      }
-    }, 1000);
+      }, 1000);
+    }
   }
 }
 
