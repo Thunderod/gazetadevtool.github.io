@@ -417,7 +417,7 @@ export function AppsList() {
                   <div>
                     <label className="block text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Supported Ad Formats</label>
                     <div className="grid grid-cols-2 gap-3">
-                      {(['banner', 'interstitial', 'rewarded', 'native']).map((f) => (
+                      {(['banner', 'normal', 'rewarded']).map((f) => (
                         <label
                           key={f}
                           className={`flex items-center p-3 border rounded-xl cursor-pointer transition-all ${

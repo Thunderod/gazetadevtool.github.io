@@ -18,15 +18,15 @@ export function IntegrationDocs() {
   <gazeta-ad app-id="YOUR_APP_ID"></gazeta-ad>
 </div>`;
   
-  const advancedSnippet = `<!-- Advanced Rewarded Ad Example -->
+  const advancedSnippet = `<!-- Advanced Video Ad Example -->
 <gazeta-ad 
   app-id="YOUR_APP_ID"
   target-age="18-35" 
   app-category="finance"
-  format="rewarded"
+  format="video"
 >
-  <button slot="close-button" onclick="grantReward()">
-    Claim Reward
+  <button slot="close-button" onclick="closeAd()">
+    Close Ad
   </button>
 </gazeta-ad>`;
 
@@ -155,13 +155,13 @@ export function IntegrationDocs() {
               <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex flex-col gap-1">
-                    <code className="text-[13px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded border border-violet-100 dark:border-violet-800/50 w-fit">format="rewarded"</code>
-                    <code className="text-[13px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded border border-violet-100 dark:border-violet-800/50 w-fit">skip-after="10"</code>
+                    <code className="text-[13px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded border border-violet-100 dark:border-violet-800/50 w-fit">format="video"</code>
+                    <code className="text-[13px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 px-2 py-1 rounded border border-violet-100 dark:border-violet-800/50 w-fit">format="banner"</code>
                   </div>
-                  <span className="text-[11px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-widest bg-violet-50 dark:bg-violet-900/20 px-2 py-0.5 rounded border border-violet-100 dark:border-violet-800/50">Format & Timing</span>
+                  <span className="text-[11px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-widest bg-violet-50 dark:bg-violet-900/20 px-2 py-0.5 rounded border border-violet-100 dark:border-violet-800/50">Format & Type</span>
                 </div>
                 <p className="text-[13px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                  Pass <code className="text-zinc-700 dark:text-zinc-300 font-mono">format="rewarded"</code> to fetch unskippable 30s ads (perfect for unlocking in-app currency). Or pass <code className="text-zinc-700 dark:text-zinc-300 font-mono">format="normal"</code> with <code className="text-zinc-700 dark:text-zinc-300 font-mono">skip-after="5"</code> to enforce a strict countdown before the user's custom close button is revealed.
+                  Pass <code className="text-zinc-700 dark:text-zinc-300 font-mono">format="video"</code> to fetch high-engagement video ads. Or pass <code className="text-zinc-700 dark:text-zinc-300 font-mono">format="banner"</code> to fetch static image ads. The ad type (whether it is rewarded or standard) is configured directly inside your app properties in the Dev Console, allowing you to change logic without touching your code.
                 </p>
               </div>
 
@@ -186,10 +186,10 @@ export function IntegrationDocs() {
                 <span className="text-emerald-300">  app-id=</span><span className="text-amber-300">"YOUR_APP_ID"</span>{'\n'}
                 <span className="text-emerald-300">  target-age=</span><span className="text-amber-300">"18-35"</span>{'\n'}
                 <span className="text-emerald-300">  app-category=</span><span className="text-amber-300">"finance"</span>{'\n'}
-                <span className="text-emerald-300">  format=</span><span className="text-amber-300">"rewarded"</span>{'\n'}
+                <span className="text-emerald-300">  format=</span><span className="text-amber-300">"video"</span>{'\n'}
                 <span className="text-brand-400">&gt;</span>{'\n'}
-                <span className="text-zinc-300">  </span><span className="text-brand-400">&lt;button</span><span className="text-emerald-300"> slot=</span><span className="text-amber-300">"close-button"</span><span className="text-emerald-300"> onclick=</span><span className="text-amber-300">"grantReward()"</span><span className="text-brand-400">&gt;</span>{'\n'}
-                <span className="text-zinc-300">    Claim Reward</span>{'\n'}
+                <span className="text-zinc-300">  </span><span className="text-brand-400">&lt;button</span><span className="text-emerald-300"> slot=</span><span className="text-amber-300">"close-button"</span><span className="text-emerald-300"> onclick=</span><span className="text-amber-300">"closeAd()"</span><span className="text-brand-400">&gt;</span>{'\n'}
+                <span className="text-zinc-300">    Close Ad</span>{'\n'}
                 <span className="text-zinc-300">  </span><span className="text-brand-400">&lt;/button&gt;</span>{'\n'}
                 <span className="text-brand-400">&lt;/gazeta-ad&gt;</span>
               </pre>
