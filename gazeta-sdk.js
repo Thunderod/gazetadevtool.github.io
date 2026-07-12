@@ -42,6 +42,7 @@ class GazetaAdWidget extends HTMLElement {
         :host {
           display: block;
           width: 100%;
+          height: 100%;
           container-type: inline-size;
           container-name: gazeta-ad;
           
