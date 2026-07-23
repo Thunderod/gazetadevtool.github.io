@@ -167,13 +167,14 @@ class GazetaAdWidget extends HTMLElement {
     }
   }
 
-  async trackEvent(appId, eventType) {
+  async trackEvent(appId, campaignId, eventType) {
     try {
-      await fetch("https://hvoubbgzntldqoxqyoij.supabase.co/functions/v1/serve-ad", {
+      await fetch("https://hvoubbgzntldqoxqyoij.supabase.co/functions/v1/track-event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           app_id: appId,
+          campaign_id: campaignId,
           event_type: eventType,
           event: eventType,
           action: eventType
@@ -722,7 +723,7 @@ class GazetaAdWidget extends HTMLElement {
     // Tracking Logic
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
-        this.trackEvent(appId, 'impression');
+        this.trackEvent(appId, ad.id, 'impression');
         observer.disconnect();
       }
     }, { threshold: 0.3 });
@@ -736,7 +737,7 @@ class GazetaAdWidget extends HTMLElement {
       wrapper.addEventListener('click', (e) => {
         // Prevent click if clicking a control
         if (e.target.closest('.top-actions')) return;
-        this.trackEvent(appId, 'click');
+        this.trackEvent(appId, ad.id, 'click');
         if (ad.destination_url && isBanner) {
             window.open(ad.destination_url, '_blank');
         }
@@ -747,7 +748,7 @@ class GazetaAdWidget extends HTMLElement {
     if (ctaBtn) {
       ctaBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.trackEvent(appId, 'click');
+        this.trackEvent(appId, ad.id, 'click');
         if (ad.destination_url && isBanner) {
             window.open(ad.destination_url, '_blank');
         }
@@ -777,7 +778,7 @@ class GazetaAdWidget extends HTMLElement {
               if (countdownBadge) countdownBadge.style.display = 'none';
               if (closeSlotWrapper) closeSlotWrapper.style.display = 'block';
               if (format === 'rewarded') {
-                 this.trackEvent(appId, 'reward_granted');
+                 this.trackEvent(appId, ad.id, 'reward_granted');
               }
             }
           }, 1000);
