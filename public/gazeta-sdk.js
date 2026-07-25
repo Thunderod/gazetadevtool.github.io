@@ -167,23 +167,7 @@ class GazetaAdWidget extends HTMLElement {
     }
   }
 
-  async trackEvent(appId, campaignId, eventType) {
-    try {
-      await fetch("https://lmciqtqzvsubnrvttvit.supabase.co/functions/v1/track-event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          app_id: appId,
-          campaign_id: campaignId,
-          event_type: eventType,
-          event: eventType,
-          action: eventType
-        })
-      });
-    } catch (e) {
-      console.error("Gazeta SDK tracking error:", e);
-    }
-  }
+  
 
   renderAd(ad, appId, format, rootStyles) {
     const playIcon = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
@@ -723,7 +707,7 @@ class GazetaAdWidget extends HTMLElement {
     // Tracking Logic
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
-        this.trackEvent(appId, ad.id, 'impression');
+        
         observer.disconnect();
       }
     }, { threshold: 0.3 });
@@ -737,7 +721,7 @@ class GazetaAdWidget extends HTMLElement {
       wrapper.addEventListener('click', (e) => {
         // Prevent click if clicking a control
         if (e.target.closest('.top-actions')) return;
-        this.trackEvent(appId, ad.id, 'click');
+        
         if (ad.destination_url && isBanner) {
             window.open(ad.destination_url, '_blank');
         }
@@ -748,7 +732,7 @@ class GazetaAdWidget extends HTMLElement {
     if (ctaBtn) {
       ctaBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.trackEvent(appId, ad.id, 'click');
+        
         if (ad.destination_url && isBanner) {
             window.open(ad.destination_url, '_blank');
         }
@@ -778,7 +762,7 @@ class GazetaAdWidget extends HTMLElement {
               if (countdownBadge) countdownBadge.style.display = 'none';
               if (closeSlotWrapper) closeSlotWrapper.style.display = 'block';
               if (format === 'rewarded') {
-                 this.trackEvent(appId, ad.id, 'reward_granted');
+                 
               }
             }
           }, 1000);
@@ -789,3 +773,4 @@ class GazetaAdWidget extends HTMLElement {
 }
 
 customElements.define('gazeta-ad', GazetaAdWidget);
+

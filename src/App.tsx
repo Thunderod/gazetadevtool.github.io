@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { Dashboard } from './pages/Dashboard';
 import { AppsList } from './pages/AppsList';
-import { Analytics } from './pages/Analytics';
 import { Login } from './pages/Login';
 import { AuthCallback } from './pages/AuthCallback';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -43,7 +42,6 @@ export default function App() {
               <Route path="/" element={<DashboardLayout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="apps" element={<AppsList />} />
-                <Route path="analytics" element={<Analytics />} />
                 <Route path="docs" element={<IntegrationDocs />} />
                 <Route path="payouts" element={<div className="text-slate-500 p-8 text-center font-medium">Payouts Dashboard (Coming soon)</div>} />
                 <Route path="settings" element={<Settings />} />

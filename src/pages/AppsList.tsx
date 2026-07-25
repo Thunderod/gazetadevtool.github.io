@@ -207,14 +207,13 @@ export function AppsList() {
               <th scope="col" className="px-6 py-4">Platform</th>
               <th scope="col" className="px-6 py-4">Bundle ID / Domain</th>
               <th scope="col" className="px-6 py-4">Status</th>
-              <th scope="col" className="px-6 py-4">Est. Revenue (7d)</th>
               <th scope="col" className="px-6 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
             {isLoading ? (
               <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-zinc-500 dark:text-zinc-400">
+                <td colSpan={6} className="px-6 py-8 text-center text-zinc-500 dark:text-zinc-400">
                   <div className="flex justify-center mb-2">
                     <Loader2 className="h-6 w-6 animate-spin text-brand-500" />
                   </div>
@@ -223,7 +222,7 @@ export function AppsList() {
               </tr>
             ) : apps.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-zinc-500 dark:text-zinc-400">
+                <td colSpan={6} className="px-6 py-8 text-center text-zinc-500 dark:text-zinc-400">
                   No applications found. Add your first app to get started.
                 </td>
               </tr>
@@ -260,7 +259,6 @@ export function AppsList() {
                     {app.status === 'active' ? 'LIVE' : app.status.toUpperCase()}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-zinc-900 dark:text-zinc-100 font-semibold">$0.00</td>
                 <td className="px-6 py-4 text-right">
                   <button 
                     onClick={() => confirmDelete(app)}

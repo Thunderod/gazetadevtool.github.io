@@ -140,3 +140,4 @@ export function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
     </>
   );
 }
+
