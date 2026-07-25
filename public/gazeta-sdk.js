@@ -3,7 +3,7 @@ if (!window.Gazeta) {
     pool: [],
     init: async function(appId, targetAge = 'all', appCategory = 'all') {
       try {
-        const response = await fetch("https://hvoubbgzntldqoxqyoij.supabase.co/functions/v1/serve-ad", {
+        const response = await fetch("https://lmciqtqzvsubnrvttvit.supabase.co/functions/v1/serve-ad", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ app_id: appId, target_age: targetAge, app_category: appCategory })
@@ -136,7 +136,7 @@ class GazetaAdWidget extends HTMLElement {
     }
 
     try {
-      const response = await fetch("https://hvoubbgzntldqoxqyoij.supabase.co/functions/v1/serve-ad", {
+      const response = await fetch("https://lmciqtqzvsubnrvttvit.supabase.co/functions/v1/serve-ad", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -169,7 +169,7 @@ class GazetaAdWidget extends HTMLElement {
 
   async trackEvent(appId, campaignId, eventType) {
     try {
-      await fetch("https://hvoubbgzntldqoxqyoij.supabase.co/functions/v1/track-event", {
+      await fetch("https://lmciqtqzvsubnrvttvit.supabase.co/functions/v1/track-event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
