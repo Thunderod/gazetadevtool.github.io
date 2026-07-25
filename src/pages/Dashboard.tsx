@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DollarSign, Eye, Smartphone, MousePointerClick, Activity, Loader2, ArrowUpRight, Plus, Box, CheckCircle2, Zap, BookOpen, ArrowRight, CreditCard, LayoutTemplate } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { supabase } from '../lib/supabase';
+import { supabase, analyticsSupabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { ActivityTimeline } from '../components/ActivityTimeline';
 import { motion } from 'framer-motion';
@@ -37,7 +37,7 @@ export function Dashboard() {
 
         if (appsData && appsData.length > 0) {
           const appIds = appsData.map(a => a.id);
-          const { data: statsData } = await supabase.from('daily_stats').select('*').in('app_id', appIds).order('date', { ascending: true });
+          const { data: statsData } = await analyticsSupabase.from('daily_stats').select('*').in('app_id', appIds).order('date', { ascending: true });
           if (statsData) setDailyStats(statsData);
         }
       } catch (e) {

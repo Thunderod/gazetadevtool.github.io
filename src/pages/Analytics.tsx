@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
-import { supabase } from '../lib/supabase';
+import { analyticsSupabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -16,7 +16,7 @@ export function Analytics() {
       try {
         setIsLoading(true);
         // Added video metrics to the query
-        const { data: statsData, error } = await supabase
+        const { data: statsData, error } = await analyticsSupabase
           .from('daily_stats')
           .select('date, requests, impressions, clicks, video_start, video_25_percent, video_50_percent, video_75_percent, video_complete')
           .order('date', { ascending: true })
